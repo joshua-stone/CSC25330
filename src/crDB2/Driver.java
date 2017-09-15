@@ -1,17 +1,6 @@
 package crDB2;
 
 /*
-Create a class Rectangle with double attributes length and width. The default constructor should set
-these attributes to 1. Provide methods that calculate the rectangle’s perimeter and area, as well as
-accessors and mutators for both data fields. The mutator methods for length and width should verify
-that the number being passed in is larger than 0.0 and less than 20.0 -- if it doesn’t fit those
-criteria, the value of the field should not be changed and set back to these attributes to 1.
-
-Write a Driver class in the separate file to test your Rectangle class. It should prompt the user to
-enter a length and width of a rectangle, and then print out the area and perimeter of the rectangle.
-*/
-
-/*
    Revision History:
    Date:        By:             Action:
    ---------------------------------------------------
