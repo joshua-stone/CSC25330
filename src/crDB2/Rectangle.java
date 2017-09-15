@@ -67,7 +67,6 @@ public class Rectangle {
     // Override toString() so information can be printed implicitly. Use formatting for two decimal places
     @Override
     public String toString() {
-        super.toString();
         return String.format("Area %.2f, perimeter: %.2f", this.getArea(), this.getPerimeter());
     }
 }
