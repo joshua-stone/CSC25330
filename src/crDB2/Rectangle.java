@@ -21,20 +21,20 @@ public class Rectangle {
     private double width;
 
     // Default constructor sets length and width to 1.0
-    Rectangle() {
+    public Rectangle() {
         this(1.0, 1.0);
     }
     // Let rectangle length and width be defined at instantiation
-    Rectangle(final double length, final double width) {
+    public Rectangle(final double length, final double width) {
         this.setLength(length);
         this.setWidth(width);
     }
     // Set length to either a number between 0.0 and 20.0, or 1.0
-    void setLength(final double length) {
+    public void setLength(final double length) {
         this.length = this.distanceHelper(length);
     }
     // Set width to either a number between 0.0 and 20.0, or 1.0
-    void setWidth(final double width) {
+    public void setWidth(final double width) {
         this.width = this.distanceHelper(width);
     }
     // Private helper method to share common logic between setLength() and setWidth()
@@ -49,19 +49,19 @@ public class Rectangle {
         return newDistance;
     }
     // Return length
-    double getLength() {
+    public double getLength() {
         return this.length;
     }
     // Return width
-    double getWidth() {
+    public double getWidth() {
         return this.width;
     }
     // Calculate area by multiplying length and width
-    double getArea() {
+    public double getArea() {
         return this.getLength() * this.getWidth();
     }
     // Calculate perimeter by doubling the sum of length and width
-    double getPerimeter() {
+    public double getPerimeter() {
         return 2 * (this.getLength() + this.getWidth());
     }
     // Override toString() so information can be printed implicitly. Use formatting for two decimal places
