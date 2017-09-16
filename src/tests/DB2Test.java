@@ -1,6 +1,6 @@
 package tests;
 
-import crDB2.Rectangle;
+import DB2.Rectangle;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,7 +12,7 @@ interface Defaults {
     String OUTPUT = String.format("Area %.2f, perimeter: %.2f", AREA, PERIMETER);
 }
 
-class crDB2Test {
+class DB2Test {
     // Ensure that the default constructor produces the expected values
     @Test
     void rectangleDefaultValues() {
