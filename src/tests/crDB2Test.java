@@ -9,7 +9,7 @@ interface Defaults {
     double WIDTH = 1.0;
     double PERIMETER = 2 * (LENGTH + WIDTH);
     double AREA = LENGTH * WIDTH;
-    String OUTPUT = "Area 1.00, perimeter: 4.00";
+    String OUTPUT = String.format("Area %.2f, perimeter: %.2f", AREA, PERIMETER);
 }
 
 class crDB2Test {
