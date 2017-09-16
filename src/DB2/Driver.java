@@ -1,4 +1,4 @@
-package crDB2;
+package DB2;
 
 /*
    Revision History:
