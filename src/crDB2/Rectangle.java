@@ -13,6 +13,7 @@ package crDB2;
    09/13/17     Joshua Stone    Add constraints for setLength() and setWidth()
    09/13/17     Joshua Stone    Override toString() and add string formatting for perimeter and area
    09/13/17     Joshua Stone    Add helper method for setLength() and setWidth()
+   09/13/17     Joshua Stone    Make interfaces public so they can be used outside package
 */
 
 public class Rectangle {
