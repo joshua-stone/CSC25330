@@ -10,28 +10,37 @@ package DB2;
    09/13/17     Joshua Stone    Use Scanner() for input
    09/13/17     Joshua Stone    Parse doubles from scanner for setting length and width of rectangle
    09/13/17     Joshua Stone    Display results for perimeter and area
+   09/18/17     Joshua Stone    Implement more robust input parsing
 */
 
 import java.util.Scanner;
 
 public class Driver {
     public static void main(String[] args) {
-        // Scanner() is used for parsing user input
-        Scanner input = new Scanner(System.in);
-        // Instantiate a Rectangle with default arguments
-        Rectangle rectangle = new Rectangle();
+        // Ask for rectangle length
+        final double length = getInput("Enter length of rectangle: ");
+        // Ask for rectangle width
+        final double width = getInput("Enter width of rectangle: ");
 
-        // Ask for length, and pass the result into rectangle.setLength()
-        System.out.print("Enter length of rectangle: ");
-        rectangle.setLength(input.nextDouble());
-        System.out.println();
-
-        // Ask for width, and pass the result into rectangle.setWidth()
-        System.out.print("Enter width of rectangle: ");
-        rectangle.setWidth(input.nextDouble());
-        System.out.println();
-
+        final Rectangle rect = new Rectangle(length, width);
         // toString() is called implicitly; should return "Area: <number>, perimeter: <number>"
-        System.out.println(rectangle);
+        System.out.println(rect);
+    }
+    // Helper method for reusing input parsing logic
+    private static double getInput(String inputText) {
+        final Scanner input = new Scanner(System.in);
+        double nextNumber;
+
+        while (true) {
+            try {
+                System.out.print(inputText);
+                nextNumber = Double.parseDouble(input.nextLine());
+                System.out.println();
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Incorrect Input. Try again.");
+            }
+        }
+        return nextNumber;
     }
 }
