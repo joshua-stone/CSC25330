@@ -1,6 +1,12 @@
 package DB2;
 
 /*
+   Program: Driver.java
+   Written by: Joshua Stone
+   Description: Asks for a length and width, then creates a Rectangle and prints its area and perimeter
+   Challenges: Making robust user input handling
+   Time Spent: 1 hour
+
    Revision History:
    Date:        By:             Action:
    ---------------------------------------------------
