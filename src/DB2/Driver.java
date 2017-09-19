@@ -16,7 +16,7 @@ package DB2;
 import java.util.Scanner;
 
 public class Driver {
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         // Ask for rectangle length
         final double length = getInput("Enter length of rectangle: ");
         // Ask for rectangle width
@@ -27,7 +27,7 @@ public class Driver {
         System.out.println(rect);
     }
     // Helper method for reusing input parsing logic
-    private static double getInput(String inputText) {
+    private static double getInput(final String inputText) {
         final Scanner input = new Scanner(System.in);
         double nextNumber;
 
