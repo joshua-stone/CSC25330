@@ -1,6 +1,11 @@
 package DB2;
 
 /*
+   Program: Rectangle.java
+   Written by: Joshua Stone
+   Description: Rectangle class that takes length and width as arguments and returns information like area and perimeter
+   Challenges: Writing constructor and setter logic that's reusable
+   Time Spent: 1 hour
    Revision History:
    Date:        By:             Action:
    ---------------------------------------------------
