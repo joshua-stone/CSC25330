@@ -1,3 +1,18 @@
+/*
+   Program: Shape.java
+   Written by: Joshua Stone
+   Description:
+   Challenges:
+   Time Spent:
+
+   Revision History:
+   Date:        By:             Action:
+   ---------------------------------------------------
+   09/21/17     Joshua Stone    Initial commit
+   09/21/17     Joshua Stone    Added setters, getters, and constructors
+   09/21/17     Joshua Stone    Added abstract methods for subclasses
+*/
+
 package assignment1;
 
 abstract class Shape {
@@ -7,7 +22,7 @@ abstract class Shape {
     public Shape() {
         this(1, 1);
     }
-    Shape(final int x, final int y) {
+    public Shape(final int x, final int y) {
         this.setX(x);
         this.setY(y);
     }
@@ -17,4 +32,7 @@ abstract class Shape {
     public void setY(final int y) {
         this.Y = y;
     }
+    public abstract String getName();
+    public abstract double getArea();
+    public abstract double getPerimeter();
 }
