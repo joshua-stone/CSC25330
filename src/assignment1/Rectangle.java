@@ -39,4 +39,7 @@ public class Rectangle {
     public double getHeight() {
         return this.height;
     }
+    public double getArea() {
+        return this.getWidth() * this.getHeight();
+    }
 }
