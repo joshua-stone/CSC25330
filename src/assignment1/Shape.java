@@ -32,6 +32,12 @@ abstract class Shape {
     public void setY(final int y) {
         this.Y = y;
     }
+    public int getX() {
+        return this.X;
+    }
+    public int getY() {
+        return this.Y;
+    }
     public abstract String getName();
     public abstract double getArea();
     public abstract double getPerimeter();
