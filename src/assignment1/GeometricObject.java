@@ -1,5 +1,5 @@
 /*
-   Program: Shape.java
+   Program: GeometricObject.java
    Written by: Joshua Stone
    Description:
    Challenges:
@@ -11,7 +11,7 @@
    09/21/17     Joshua Stone    Initial commit
    09/21/17     Joshua Stone    Added constructors
    09/21/17     Joshua Stone    Added setters and getter
-   09/21/17     Joshua Stone    Initial compareTo implementation
+   09/21/17     Joshua Stone    Initial compareTo() implementation
    09/21/17     Joshua Stone    Added max()
 */
 
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
-public class GeometricObject extends Shape implements Comparable<GeometricObject> {
+public abstract class GeometricObject extends Shape implements Comparable<GeometricObject> {
     private String color;
     private boolean filled;
     private Date dateCreated;
@@ -48,16 +48,8 @@ public class GeometricObject extends Shape implements Comparable<GeometricObject
         return this.dateCreated;
     }
     @Override
-    public double getArea() {
-        return 0;
-    }
-    @Override
-    public double getPerimeter() {
-        return 0;
-    }
-    @Override
-    public String getName() {
-        return "";
+    public String toString() {
+        return super.toString();
     }
     public static GeometricObject max(final GeometricObject o1, final GeometricObject o2) {
         final GeometricObject max;
