@@ -34,7 +34,7 @@ public abstract class GeometricObject extends Shape implements Comparable<Geomet
     }
     // Constructor where a color and fill field can be specified
     public GeometricObject(final String color, final boolean filled) {
-        this(1,1, color, filled);
+        this(1, 1, color, filled);
     }
     // Constructor which all other contructors may call
     public GeometricObject(final int x, final int y, final String color, final boolean filled) {
