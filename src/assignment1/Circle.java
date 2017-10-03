@@ -19,6 +19,7 @@
 package assignment1;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.abs;
 import static java.lang.Math.pow;
 
 public class Circle extends GeometricObject {
@@ -40,16 +41,12 @@ public class Circle extends GeometricObject {
         this.setFilled(filled);
     }
     // Set radius with double
-    public void setRadius(double radius) {
-        if (radius <= 0) {
-            this.radius = 1.0;
-        } else {
-            this.radius = radius;
-        }
+    public void setRadius(final double radius) {
+        this.radius = abs(radius);
     }
     // Set diameter which actually sets radius
-    public void setDiameter(double diameter) {
-        this.radius = diameter / 2.0;
+    public void setDiameter(final double diameter) {
+        this.setRadius(diameter / 2.0);
     }
     // Get radius
     public double getRadius() {

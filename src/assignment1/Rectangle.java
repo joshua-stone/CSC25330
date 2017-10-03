@@ -19,6 +19,8 @@
 
 package assignment1;
 
+import static java.lang.Math.abs;
+
 public class Rectangle extends GeometricObject {
     private double width;
     private double height;
@@ -36,19 +38,11 @@ public class Rectangle extends GeometricObject {
     }
     // Set rectangle width
     public void setWidth(final double width) {
-        if (width <= 0.0) {
-            this.width = 1.0;
-        } else {
-            this.width = width;
-        }
+        this.width = abs(width);
     }
     // Set rectangle height
     public void setHeight(final double height) {
-        if (height <= 0.0) {
-            this.height = 1.0;
-        } else {
-            this.height = height;
-        }
+        this.height = abs(height);
     }
     // Return rectangle width
     public double getWidth() {
