@@ -15,12 +15,15 @@
    09/21/17     Joshua Stone    Added max()
    09/30/17     Joshua Stone    Use SimpleDateFormat for date formatting
    09/30/17     Joshua Stone    Complete compareTo() implementation
+   10/03/17     Joshua Stone    Static import String.format
 */
 
 package assignment1;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
+
+import static java.lang.String.format;
 
 public abstract class GeometricObject extends Shape implements Comparable<GeometricObject> {
     // Keep fields private for encapsulation
@@ -73,7 +76,7 @@ public abstract class GeometricObject extends Shape implements Comparable<Geomet
         // SimpleDateFormat appears to be the easiest way to parse and format Date()
         final String date = new SimpleDateFormat(datePattern).format(this.getDateCreated());
 
-        return String.format("created on %s\ncolor: %s and filled %b\n\n", date, this.getColor(), this.isFilled());
+        return format("created on %s\ncolor: %s and filled %b\n\n", date, this.getColor(), this.isFilled());
     }
     // Returns first object if its area is larger than the second one, or else return the second object
     public static GeometricObject max(final GeometricObject o1, final GeometricObject o2) {

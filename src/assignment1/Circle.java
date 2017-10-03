@@ -14,6 +14,7 @@
    09/30/17     Joshua Stone    Implemented getName()
    09/30/17     Joshua Stone    Added more setters in constructors
    10/02/17     Joshua Stone    Add checks for negative values
+   10/03/17     Joshua Stone    Static import String.format
 */
 
 package assignment1;
@@ -21,6 +22,7 @@ package assignment1;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.pow;
+import static java.lang.String.format;
 
 public class Circle extends GeometricObject {
     // Keep radius private so it can only be accessed through setRadius()
@@ -54,7 +56,7 @@ public class Circle extends GeometricObject {
     }
     // Get diameter by doubling radius
     public double getDiameter() {
-        return this.radius * 2.0;
+        return this.getRadius() * 2.0;
     }
     // Get area by calling Pi * radius^2
     public double getArea() {
@@ -66,6 +68,6 @@ public class Circle extends GeometricObject {
     }
     // Return string of shape name followed by its radius
     public String getName() {
-        return String.format("[Circle] radius = %.1f", this.getRadius());
+        return format("[Circle] radius = %.1f", this.getRadius());
     }
 }

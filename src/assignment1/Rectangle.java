@@ -15,11 +15,13 @@
    09/30/17     Joshua Stone    Implemented getName()
    09/30/17     Joshua Stone    Added more setters in contructors
    10/02/17     Joshua Stone    Add check for negative values
+   10/03/17     Joshua Stone    Static import String.format
 */
 
 package assignment1;
 
 import static java.lang.Math.abs;
+import static java.lang.String.format;
 
 public class Rectangle extends GeometricObject {
     private double width;
@@ -58,10 +60,10 @@ public class Rectangle extends GeometricObject {
     }
     // Add two sides and multiply to get perimeter
     public double getPerimeter() {
-        return 2 * (this.height + this.width);
+        return 2 * (this.getHeight() + this.getWidth());
     }
     // Return string with the name of the shape followed by width and height
     public String getName() {
-        return String.format("[Rectangle] width = %.1f and height = %.1f", this.getWidth(), this.getHeight());
+        return format("[Rectangle] width = %.1f and height = %.1f", this.getWidth(), this.getHeight());
     }
 }
