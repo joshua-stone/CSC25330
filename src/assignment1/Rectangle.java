@@ -14,6 +14,7 @@
    09/21/17     Joshua Stone    Added setters and getters
    09/30/17     Joshua Stone    Implemented getName()
    09/30/17     Joshua Stone    Added more setters in contructors
+   10/02/17     Joshua Stone    Add check for negative values
 */
 
 package assignment1;
@@ -22,9 +23,11 @@ public class Rectangle extends GeometricObject {
     private double width;
     private double height;
 
+    // Default constructor
     public Rectangle() {
         this(10.0, 5.0);
     }
+    // Constructor which may set width and height
     public Rectangle(final double width, final double height) {
         this.setWidth(width);
         this.setHeight(height);

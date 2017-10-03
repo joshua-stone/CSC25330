@@ -13,6 +13,7 @@
    09/21/17     Joshua Stone    Added setters and getters
    09/30/17     Joshua Stone    Implemented getName()
    09/30/17     Joshua Stone    Added more setters in constructors
+   10/02/17     Joshua Stone    Add checks for negative values
 */
 
 package assignment1;
