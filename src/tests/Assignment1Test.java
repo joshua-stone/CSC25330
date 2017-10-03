@@ -19,6 +19,15 @@ interface CircleDefaults {
     boolean FILLED = false;
     String NAME = String.format("[Circle] radius = %.1f", RADIUS);
 }
+interface RectangleDefaults {
+    double WIDTH = 10.0;
+    double HEIGHT = 5.0;
+    double AREA = WIDTH * HEIGHT;
+    double PERIMETER = 2 * (WIDTH + HEIGHT);
+    String COLOR = "white";
+    boolean FILLED = false;
+    String NAME = String.format("[Rectangle] width = %.1f and height = %.1f", WIDTH, HEIGHT);
+}
 class CircleTest {
     final double RADIUS;
     final double DIAMETER;
@@ -44,9 +53,33 @@ class CircleTest {
         this.NAME = String.format("[Circle] radius = %.1f", this.RADIUS);
     }
 }
+class RectangleTest {
+    final double WIDTH;
+    final double HEIGHT;
+    final double AREA;
+    final double PERIMETER;
+    final String COLOR;
+    final boolean FILLED;
+    final String NAME;
+
+    RectangleTest() {
+        this(RectangleDefaults.WIDTH, RectangleDefaults.HEIGHT);
+    }
+    RectangleTest(final double width, final double height) {
+        this.WIDTH = width;
+        this.HEIGHT = height;
+        this.AREA = this.WIDTH * this.HEIGHT;
+        this.PERIMETER = 2 * (this.WIDTH + this.HEIGHT);
+        this.COLOR = "white";
+        this.FILLED = false;
+        this.NAME = String.format("[Rectangle] width = %.1f and height = %.1f", this.WIDTH, this.HEIGHT);
+    }
+}
 public class Assignment1Test {
     final Circle circle1 = new Circle(3.0);
     final Circle circle2 = new Circle(6.0, "RED", true);
+    final Rectangle rect1 = new Rectangle(71, 96);
+    final Rectangle rect2 = new Rectangle();
     @Test
     void circleDefaultValues() {
         compareCircles(new Circle(), new CircleTest());
@@ -60,8 +93,24 @@ public class Assignment1Test {
         compareCircles(circle2, new CircleTest(circle2.getRadius(), circle2.getColor(), circle2.isFilled()));
     }
     @Test
-    void CircleMax() {
+    void circleMax() {
         assertEquals(GeometricObject.max(circle1, circle2), circle2);
+    }
+    @Test
+    void rectangleDefaultValues() {
+        compareRectangles(new Rectangle(), new RectangleTest());
+    }
+    @Test
+    void rect1Values() {
+        compareRectangles(rect1, new RectangleTest(rect1.getWidth(), rect1.getHeight()));
+    }
+    @Test
+    void rect2Values() {
+        compareRectangles(rect2, new RectangleTest());
+    }
+    @Test
+    void rectangleMax() {
+        assertEquals(GeometricObject.max(rect1, rect2), rect1);
     }
     void compareCircles(Circle circle, CircleTest circleTest) {
         assertTrue(circle instanceof GeometricObject);
@@ -72,5 +121,15 @@ public class Assignment1Test {
         assertEquals(circle.getColor(), circleTest.COLOR);
         assertEquals(circle.isFilled(), circleTest.FILLED);
         assertEquals(circle.getName(), circleTest.NAME);
+    }
+    void compareRectangles(Rectangle rectangle, RectangleTest rectangleTest) {
+        assertTrue(rectangle instanceof GeometricObject);
+        assertEquals(rectangle.getWidth(), rectangleTest.WIDTH);
+        assertEquals(rectangle.getHeight(), rectangleTest.HEIGHT);
+        assertEquals(rectangle.getArea(), rectangleTest.AREA);
+        assertEquals(rectangle.getPerimeter(), rectangleTest.PERIMETER);
+        assertEquals(rectangle.getColor(), rectangleTest.COLOR);
+        assertEquals(rectangle.isFilled(), rectangleTest.FILLED);
+        assertEquals(rectangle.getName(), rectangleTest.NAME);
     }
 }

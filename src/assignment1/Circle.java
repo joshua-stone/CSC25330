@@ -56,7 +56,7 @@ public class Circle extends GeometricObject {
     }
     // Get area by calling Pi * radius^2
     public double getArea() {
-        return PI * pow(this.getRadius(), 2);
+        return PI * pow(this.getRadius(), 2.0);
     }
     // Get perimeter by multiplying Pi by perimeter
     public double getPerimeter() {

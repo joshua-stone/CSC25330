@@ -69,7 +69,7 @@ public abstract class GeometricObject extends Shape implements Comparable<Geomet
     @Override
     public String toString() {
         // weekday month day hour:minute:second timezone year
-        final String datePattern = "E M dd HH:mm:ss z yyyy";
+        final String datePattern = "E MMM dd HH:mm:ss z yyyy";
         // SimpleDateFormat appears to be the easiest way to parse and format Date()
         final String date = new SimpleDateFormat(datePattern).format(this.getDateCreated());
 
