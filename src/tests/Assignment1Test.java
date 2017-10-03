@@ -1,6 +1,7 @@
 package tests;
 
 import assignment1.Circle;
+import assignment1.GeometricObject;
 import assignment1.Rectangle;
 
 import org.junit.jupiter.api.Test;
@@ -44,13 +45,32 @@ class CircleTest {
     }
 }
 public class Assignment1Test {
+    final Circle circle1 = new Circle(3.0);
+    final Circle circle2 = new Circle(6.0, "RED", true);
     @Test
-    void CircleDefaultValues() {
-        Circle circle = new Circle();
-        CircleTest circleTest = new CircleTest();
+    void circleDefaultValues() {
+        compareCircles(new Circle(), new CircleTest());
+    }
+    @Test
+    void circle1Values() {
+        compareCircles(circle1, new CircleTest(circle1.getRadius()));
+    }
+    @Test
+    void circle2Values() {
+        compareCircles(circle2, new CircleTest(circle2.getRadius(), circle2.getColor(), circle2.isFilled()));
+    }
+    @Test
+    void CircleMax() {
+        assertEquals(GeometricObject.max(circle1, circle2), circle2);
+    }
+    void compareCircles(Circle circle, CircleTest circleTest) {
+        assertTrue(circle instanceof GeometricObject);
         assertEquals(circle.getRadius(), circleTest.RADIUS);
-        assertEquals(circle.getName(), circleTest.NAME);
-        assertEquals(circle.getArea(), circleTest.AREA);
+        assertEquals(circle.getDiameter(), circleTest.DIAMETER);
         assertEquals(circle.getPerimeter(), circleTest.PERIMETER);
+        assertEquals(circle.getArea(), circleTest.AREA);
+        assertEquals(circle.getColor(), circleTest.COLOR);
+        assertEquals(circle.isFilled(), circleTest.FILLED);
+        assertEquals(circle.getName(), circleTest.NAME);
     }
 }
