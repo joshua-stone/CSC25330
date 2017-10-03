@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.pow;
+import static java.lang.String.format;
 
 interface CircleDefaults {
     double RADIUS = 1.0;
@@ -26,7 +27,7 @@ interface RectangleDefaults {
     double PERIMETER = 2 * (WIDTH + HEIGHT);
     String COLOR = "white";
     boolean FILLED = false;
-    String NAME = String.format("[Rectangle] width = %.1f and height = %.1f", WIDTH, HEIGHT);
+    String NAME = format("[Rectangle] width = %.1f and height = %.1f", WIDTH, HEIGHT);
 }
 class CircleTest {
     final double RADIUS;
@@ -50,7 +51,7 @@ class CircleTest {
         this.AREA = PI * pow(this.RADIUS, 2.0);
         this.COLOR = color;
         this.FILLED = filled;
-        this.NAME = String.format("[Circle] radius = %.1f", this.RADIUS);
+        this.NAME = format("[Circle] radius = %.1f", this.RADIUS);
     }
 }
 class RectangleTest {
@@ -72,7 +73,7 @@ class RectangleTest {
         this.PERIMETER = 2 * (this.WIDTH + this.HEIGHT);
         this.COLOR = "white";
         this.FILLED = false;
-        this.NAME = String.format("[Rectangle] width = %.1f and height = %.1f", this.WIDTH, this.HEIGHT);
+        this.NAME = format("[Rectangle] width = %.1f and height = %.1f", this.WIDTH, this.HEIGHT);
     }
 }
 public class Assignment1Test {
