@@ -40,7 +40,11 @@ public class Circle extends GeometricObject {
     }
     // Set radius with double
     public void setRadius(double radius) {
-        this.radius = radius;
+        if (radius <= 0) {
+            this.radius = 1.0;
+        } else {
+            this.radius = radius;
+        }
     }
     // Set diameter which actually sets radius
     public void setDiameter(double diameter) {

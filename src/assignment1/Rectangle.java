@@ -33,11 +33,19 @@ public class Rectangle extends GeometricObject {
     }
     // Set rectangle width
     public void setWidth(final double width) {
-        this.width = width;
+        if (width <= 0.0) {
+            this.width = 1.0;
+        } else {
+            this.width = width;
+        }
     }
     // Set rectangle height
     public void setHeight(final double height) {
-        this.height = height;
+        if (height <= 0.0) {
+            this.height = 1.0;
+        } else {
+            this.height = height;
+        }
     }
     // Return rectangle width
     public double getWidth() {
