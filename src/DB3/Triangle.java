@@ -13,9 +13,11 @@ package DB3;
    09/21/17     Joshua Stone    Initial commit
    09/21/17     Joshua Stone    Added constructors
    09/21/17     Joshua Stone    Add setters and getters
+   09/21/17     Joshua Stone    Add getPerimeter() and getArea()
 */
 
 import static java.lang.Math.sqrt;
+import static java.lang.String.format;
 
 public class Triangle extends GeometricObject {
     private double side1;
@@ -56,5 +58,8 @@ public class Triangle extends GeometricObject {
     }
     public double getPerimeter() {
         return this.side1 + this.side2 + this.side3;
+    }
+    public String getName() {
+        return format("Triangle: side1 = %.1f side2 = %.1f side3 = %.1f", this.side1, this.side2, this.side3);
     }
 }
