@@ -10,10 +10,10 @@ package DB3;
    Revision History:
    Date:        By:             Action:
    ---------------------------------------------------
-   09/21/17     Joshua Stone    Initial commit
-   09/21/17     Joshua Stone    Added constructors
-   09/21/17     Joshua Stone    Add setters and getters
-   09/21/17     Joshua Stone    Add getPerimeter() and getArea()
+   10/05/17     Joshua Stone    Initial commit
+   10/05/17     Joshua Stone    Added constructors
+   10/05/17     Joshua Stone    Add setters and getters
+   10/05/17     Joshua Stone    Add getPerimeter() and getArea()
 */
 
 import static java.lang.Math.sqrt;

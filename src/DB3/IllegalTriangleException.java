@@ -1,7 +1,7 @@
 package DB3;
 
 /*
-   Program: Triangle.java
+   Program: IllegalTriangleException.java
    Written by: Joshua Stone
    Description: Custom exception for Triangle class
    Challenges:
@@ -10,7 +10,7 @@ package DB3;
    Revision History:
    Date:        By:             Action:
    ---------------------------------------------------
-   09/21/17     Joshua Stone    Initial commit
+   10/05/17     Joshua Stone    Initial commit
 */
 
 public class IllegalTriangleException extends Exception {
