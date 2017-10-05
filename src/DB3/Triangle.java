@@ -1,6 +1,23 @@
 package DB3;
 
-public class Triangle {
+/*
+   Program: Triangle.java
+   Written by: Joshua Stone
+   Description: Triangle class that has three sides and returns an area or perimeter
+   Challenges:
+   Time Spent:
+
+   Revision History:
+   Date:        By:             Action:
+   ---------------------------------------------------
+   09/21/17     Joshua Stone    Initial commit
+   09/21/17     Joshua Stone    Added constructors
+   09/21/17     Joshua Stone    Add setters and getters
+*/
+
+import static java.lang.Math.sqrt;
+
+public class Triangle extends GeometricObject {
     private double side1;
     private double side2;
     private double side3;
@@ -30,5 +47,14 @@ public class Triangle {
     }
     public double getSide3() {
         return this.side3;
+    }
+    public double getArea() {
+        final double s = (side1 + side2 + side3) / 2;
+        final double area = sqrt(s * (s - side1) * (s - side2) * (s - side3));
+
+        return area;
+    }
+    public double getPerimeter() {
+        return this.side1 + this.side2 + this.side3;
     }
 }
