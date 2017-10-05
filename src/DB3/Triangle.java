@@ -57,7 +57,7 @@ public class Triangle extends GeometricObject {
         return area;
     }
     public double getPerimeter() {
-        return this.side1 + this.side2 + this.side3;
+        return this.getSide1() + this.getSide2() + this.getSide3();
     }
     public String getName() {
         return format("Triangle: side1 = %.1f side2 = %.1f side3 = %.1f", this.side1, this.side2, this.side3);

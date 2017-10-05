@@ -11,6 +11,7 @@ package DB3;
    Date:        By:             Action:
    ---------------------------------------------------
    10/05/17     Joshua Stone    Initial commit
+   10/05/17     Joshua Stone    Extend Exception for custom exception for Triangle
 */
 
 public class IllegalTriangleException extends Exception {
