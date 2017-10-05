@@ -49,7 +49,7 @@ public class Triangle extends GeometricObject {
         return this.side3;
     }
     public double getArea() {
-        final double s = (side1 + side2 + side3) / 2;
+        final double s = this.getPerimeter() / 2;
         final double area = sqrt(s * (s - side1) * (s - side2) * (s - side3));
 
         return area;
