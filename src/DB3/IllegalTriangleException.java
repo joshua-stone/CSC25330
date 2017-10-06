@@ -14,10 +14,19 @@ package DB3;
    10/05/17     Joshua Stone    Extend Exception for custom exception for Triangle
 */
 
-public class IllegalTriangleException extends Exception {
-    public IllegalTriangleException() {}
+import static java.lang.String.format;
 
-    public IllegalTriangleException(String message) {
+public class IllegalTriangleException extends Exception {
+    public IllegalTriangleException() {
+        this("Illegal Triangle");
+    }
+    public IllegalTriangleException(final String message) {
         super(message);
+    }
+    public IllegalTriangleException(final Triangle triangle) {
+        this(format("Illegal Triangle:\n" +
+                    "Side1: %.1f\n" +
+                    "Side2: %.1f\n" +
+                    "Side3: %.1f", triangle.getSide1(), triangle.getSide2(), triangle.getSide3()));
     }
 }

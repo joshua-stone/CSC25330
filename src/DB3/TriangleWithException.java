@@ -11,11 +11,12 @@ package DB3;
    Date:        By:             Action:
    ---------------------------------------------------
    10/05/17     Joshua Stone    Initial commit
-   10/05/17     Joshua Stone    Add constructor
-   10/05/17     Joshua Stone    Have constructor throw exception
-   10/05/17     Joshua Stone    Add a private triangle side test
-   10/05/17     Joshua Stone    Call triangle test in constructor
+   10/05/17     Joshua Stone
+   10/05/17     Joshua Stone
+   10/05/17     Joshua Stone
 */
+
+import static java.lang.String.format;
 
 public class TriangleWithException extends Triangle {
     public TriangleWithException(final double side1, final double side2, final double side3) throws IllegalTriangleException {
@@ -24,7 +25,7 @@ public class TriangleWithException extends Triangle {
         this.setSide3(side3);
 
         if (!isValidTriangle()) {
-            throw new IllegalTriangleException();
+            throw new IllegalTriangleException(this);
         }
     }
     private boolean isValidTriangle() {
