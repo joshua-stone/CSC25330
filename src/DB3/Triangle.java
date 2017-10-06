@@ -5,7 +5,7 @@ package DB3;
    Written by: Joshua Stone
    Description: Triangle class that has three sides and returns an area or perimeter
    Challenges:
-   Time Spent:
+   Time Spent: 45 minutes
 
    Revision History:
    Date:        By:             Action:
@@ -14,6 +14,7 @@ package DB3;
    10/05/17     Joshua Stone    Added constructors
    10/05/17     Joshua Stone    Add setters and getters
    10/05/17     Joshua Stone    Add getPerimeter() and getArea()
+   10/05/17     Joshua Stone    Add getName()
 */
 
 import static java.lang.Math.sqrt;
@@ -25,7 +26,7 @@ public class Triangle extends GeometricObject {
     private double side3;
 
     public Triangle() {
-        this(1.0,1.0,1.0);
+        this(1.0, 1.0, 1.0);
     }
     public Triangle(final double side1, final double side2, final double side3) {
         this.setSide1(side1);
@@ -50,14 +51,14 @@ public class Triangle extends GeometricObject {
     public double getSide3() {
         return this.side3;
     }
-    public double getArea() {
-        final double s = this.getPerimeter() / 2;
-        final double area = sqrt(s * (s - side1) * (s - side2) * (s - side3));
-
-        return area;
-    }
     public double getPerimeter() {
         return this.getSide1() + this.getSide2() + this.getSide3();
+    }
+    public double getArea() {
+        final double s = this.getPerimeter() / 2;
+        final double area = sqrt(s * (s - this.getSide1()) * (s - this.getSide2()) * (s - this.getSide3()));
+
+        return area;
     }
     public String getName() {
         return format("Triangle: side1 = %.1f side2 = %.1f side3 = %.1f", this.side1, this.side2, this.side3);
