@@ -61,6 +61,6 @@ public class Triangle extends GeometricObject {
     }
     // Print out all three side lengths of Triangle
     public String getName() {
-        return format("Triangle: side1 = %.1f side2 = %.1f side3 = %.1f", this.side1, this.side2, this.side3);
+        return format("Triangle: side1 = %.1f side2 = %.1f side3 = %.1f", this.getSide1(), this.getSide2(), this.getSide3());
     }
 }

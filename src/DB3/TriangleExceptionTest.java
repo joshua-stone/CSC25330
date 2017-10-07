@@ -29,8 +29,8 @@ public class TriangleExceptionTest {
             final TriangleWithException t2 = new TriangleWithException(1.0, 2.0, 3.0);
 
             // Last two lines are skipped
-            System.out.println("Perimeter for t1: " + t2.getPerimeter());
-            System.out.println("Area for t1: " + t2.getArea());
+            System.out.println("Perimeter for t2: " + t2.getPerimeter());
+            System.out.println("Area for t2: " + t2.getArea());
         } catch (IllegalTriangleException error) {
             // This block is executed instead of the two skipped lines
             System.out.println(error.getMessage());
