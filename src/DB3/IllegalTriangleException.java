@@ -4,7 +4,7 @@ package DB3;
    Program: IllegalTriangleException.java
    Written by: Joshua Stone
    Description: Custom exception for Triangle class
-   Challenges:
+   Challenges: Making a clean custom exception design
    Time Spent: 30 minutes
 
    Revision History:
@@ -24,12 +24,12 @@ public class IllegalTriangleException extends Exception {
     }
     // Option to pass a Triangle and output its sides
     public IllegalTriangleException(final Triangle triangle) {
-        this(format("Illegal Triangle:\n" +
-                    "Side1: %.1f\n" +
-                    "Side2: %.1f\n" +
-                    "Side3: %.1f", triangle.getSide1(), triangle.getSide2(), triangle.getSide3()));
+        this("Illegal Triangle:\n" +
+             "Side1: " + triangle.getSide1() + "\n" +
+             "Side2: " + triangle.getSide2() + "\n" +
+             "Side3: " + triangle.getSide3() + "\n");
     }
-    // Even though we can can super() for the previous constructors, having the
+    // Even though we can use super() for the previous constructors, having the
     // option to pass strings provides some flexibility
     public IllegalTriangleException(final String message) {
         super(message);
