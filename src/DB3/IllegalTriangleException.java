@@ -15,8 +15,6 @@ package DB3;
    10/05/17     Joshua Stone    Add a constructor for IllegalTriangleException to take a Triangle argument
 */
 
-import static java.lang.String.format;
-
 public class IllegalTriangleException extends Exception {
     // Default constructor that simply states a triangle is illegal
     public IllegalTriangleException() {
