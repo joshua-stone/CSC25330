@@ -17,7 +17,7 @@ package DB3;
    10/07/17     Joshua Stone    Call super() since setters in superclass are no longer implemented
 */
 
-public class TriangleWithException extends Triangle {
+public final class TriangleWithException extends Triangle {
     // Calling this constructor means the programmer must use exception handling
     public TriangleWithException(final double side1, final double side2, final double side3) throws IllegalTriangleException {
         // Triangle(final double side1, final double side2, final double side3)

@@ -16,6 +16,8 @@ package DB3;
    10/05/17     Joshua Stone    Catch IllegalTriangleException
 */
 
+import java.util.ArrayList;
+
 public class TriangleExceptionTest {
     public static void main(final String args[]) {
         try {
