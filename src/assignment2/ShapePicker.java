@@ -11,12 +11,19 @@
    10/25/17     Joshua Stone    Initial commit
    10/25/17     Joshua Stone    Added more labels for shapes
    10/25/17     Joshua Stone    Added results labels and buttons
+   10/25/17     Joshua Stone    Implement calculate() logic and exception handling
+   10/25/17     Joshua Stone    Make a getCurrentShape() helper method
+   10/25/17     Joshua Stone    Add exception handling for invalid states
 */
 
 package assignment2;
 
 import java.awt.*;
 import javax.swing.*;
+
+import assignment1.Circle;
+import assignment1.GeometricObject;
+import assignment1.Rectangle;
 
 public class ShapePicker extends JFrame {
     private final JTextField radiusField;
@@ -29,6 +36,7 @@ public class ShapePicker extends JFrame {
     private final JComboBox<String> shapes;
     private final String options[];
     private ShapePicker() {
+        this.setTitle("GUI Application");
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.options = new String[] {
             "",
@@ -112,36 +120,65 @@ public class ShapePicker extends JFrame {
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         this.add(rootPanel);
-        this.clear();
+        this.disableEdit();
         this.pack();
     }
-    private void calculate() {
-
-    }
     private void setEdit() {
-        final int shapeIndex = this.shapes.getSelectedIndex();
-        final String currentShape = this.options[shapeIndex];
-
-        this.clear();
-
-        switch (currentShape) {
-            case "Circle":            // If circle, then set radius as editable
+        this.disableEdit();
+        switch (this.getCurrentShape()) {
+            case "Circle":
                 this.radiusField.setEditable(true);
                 break;
-            case "Rectangle":  // If rectangle, then set width and height as editable
+            case "Rectangle":
                 this.widthField.setEditable(true);
                 this.heightField.setEditable(true);
                 break;
-            case "Square":    // Else, assume square is picked and set side as editable
+            case "Square":
                 this.sideField.setEditable(true);
-                break;
+        }
+    }
+    private void calculate() {
+        final GeometricObject shapeResult;
+        final String selectedShape = this.getCurrentShape();
+
+        try {
+            if (selectedShape.equals("Circle")) {
+                shapeResult = new Circle(Double.parseDouble(this.radiusField.getText()));
+            } else if (selectedShape.equals("Rectangle")) {
+                shapeResult = new Rectangle(Double.parseDouble(this.heightField.getText()), Double.parseDouble(this.widthField.getText()));
+            } else if (selectedShape.equals("Square")) {
+                shapeResult = new Rectangle(Double.parseDouble(this.sideField.getText()), Double.parseDouble(this.sideField.getText()));
+            } else {
+                throw new IllegalComponentStateException();
+            }
+            this.shapeResult.setText(shapeResult.getName());
+            this.areaResult.setText(String.format("%f", shapeResult.getArea()));
+            this.perimeterResult.setText(String.format("%f", shapeResult.getPerimeter()));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Enter valid numbers");
+        } catch (IllegalComponentStateException e) {
+            JOptionPane.showMessageDialog(this, "Select a shape");
         }
     }
     private void clear() {
+        this.radiusField.setText("");
+        this.widthField.setText("");
+        this.heightField.setText("");
+        this.sideField.setText("");
+        this.shapeResult.setText("");
+        this.areaResult.setText("");
+        this.perimeterResult.setText("");
+    }
+    private void disableEdit() {
         this.radiusField.setEditable(false);
         this.widthField.setEditable(false);
         this.heightField.setEditable(false);
         this.sideField.setEditable(false);
+    }
+    private String getCurrentShape() {
+        final int shapeIndex = this.shapes.getSelectedIndex();
+
+        return this.options[shapeIndex];
     }
     public static void main(String[] args) {
         ShapePicker gui = new ShapePicker();
