@@ -16,16 +16,30 @@
    10/26/17     Joshua Stone    Add exception handling for invalid states
    10/27/17     Joshua Stone    Fix up UI code so it scales better with resizing
    10/27/17     Joshua Stone    Clean up results field appearance
+   10/27/17     Joshua Stone    More syntax cleanups
+   10/27/17     Joshua Stone    Change import statements to be more explicit
 */
 
 package assignment2;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.IllegalComponentStateException;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import assignment1.Circle;
 import assignment1.GeometricObject;
 import assignment1.Rectangle;
+
+import static javax.swing.JOptionPane.showMessageDialog;
+import static javax.swing.BorderFactory.createTitledBorder;
 
 public class ShapePicker extends JFrame {
     private final JTextField radiusField;
@@ -36,16 +50,17 @@ public class ShapePicker extends JFrame {
     private final JTextField areaResult;
     private final JTextField perimeterResult;
     private final JComboBox<String> shapes;
-    private final String options[];
+    private final String[] options;
 
     private ShapePicker() {
         this.setTitle("GUI Application");
+        this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.options = new String[] {
             "",
-            "Circle",
-            "Rectangle",
-            "Square"
+            "CIRCLE",
+            "RECTANGLE",
+            "SQUARE"
         };
         final JLabel shapesLabel = new JLabel("Pick up one shape: ");
         this.shapes = new JComboBox<>(options);
@@ -56,7 +71,7 @@ public class ShapePicker extends JFrame {
         shapePickerPanel.add(shapes);
 
         final JPanel inputPanel = new JPanel(new GridLayout(4, 2));
-        inputPanel.setBorder(BorderFactory.createTitledBorder("Input Data:"));
+        inputPanel.setBorder(createTitledBorder("Input Data:"));
 
         final JLabel radiusLabel = new JLabel("radius: ");
         this.radiusField = new JTextField();
@@ -77,7 +92,7 @@ public class ShapePicker extends JFrame {
         inputPanel.add(this.sideField);
 
         final JPanel resultPanel = new JPanel(new GridLayout(3, 2));
-        resultPanel.setBorder(BorderFactory.createTitledBorder("Result:"));
+        resultPanel.setBorder(createTitledBorder("Result:"));
 
         final JLabel shapeLabel = new JLabel("Shape is: ");
         this.shapeResult = new JTextField();
@@ -99,7 +114,6 @@ public class ShapePicker extends JFrame {
         resultPanel.add(perimeterLabel);
         resultPanel.add(this.perimeterResult);
 
-        resultPanel.setPreferredSize(resultPanel.getPreferredSize());
         final JButton getButton = new JButton("Get");
         getButton.addActionListener(event -> this.calculate());
 
@@ -110,7 +124,7 @@ public class ShapePicker extends JFrame {
         exitButton.addActionListener(event -> this.dispose());
 
         final JPanel buttonPanel = new JPanel(new FlowLayout());
-        // Fourth row
+
         buttonPanel.add(getButton);
         buttonPanel.add(clearButton);
         buttonPanel.add(exitButton);
@@ -132,15 +146,16 @@ public class ShapePicker extends JFrame {
     }
     private void setEdit() {
         this.disableEdit();
+
         switch (this.getCurrentShape()) {
-            case "Circle":
+            case "CIRCLE":
                 this.radiusField.setEditable(true);
                 break;
-            case "Rectangle":
+            case "RECTANGLE":
                 this.widthField.setEditable(true);
                 this.heightField.setEditable(true);
                 break;
-            case "Square":
+            case "SQUARE":
                 this.sideField.setEditable(true);
         }
     }
@@ -149,22 +164,26 @@ public class ShapePicker extends JFrame {
         final String selectedShape = this.getCurrentShape();
 
         try {
-            if (selectedShape.equals("Circle")) {
-                shapeResult = new Circle(Double.parseDouble(this.radiusField.getText()));
-            } else if (selectedShape.equals("Rectangle")) {
-                shapeResult = new Rectangle(Double.parseDouble(this.heightField.getText()), Double.parseDouble(this.widthField.getText()));
-            } else if (selectedShape.equals("Square")) {
-                shapeResult = new Rectangle(Double.parseDouble(this.sideField.getText()), Double.parseDouble(this.sideField.getText()));
-            } else {
-                throw new IllegalComponentStateException();
+            switch (selectedShape) {
+                case "CIRCLE":
+                    shapeResult = new Circle(this.getInput(this.radiusField));
+                    break;
+                case "RECTANGLE":
+                    shapeResult = new Rectangle(this.getInput(this.widthField), this.getInput(this.heightField));
+                    break;
+                case "SQUARE":
+                    shapeResult = new Rectangle(this.getInput(this.sideField), this.getInput(this.sideField));
+                    break;
+                default:
+                    throw new IllegalComponentStateException();
             }
             this.shapeResult.setText(shapeResult.getName());
             this.areaResult.setText(String.format("%.2f", shapeResult.getArea()));
             this.perimeterResult.setText(String.format("%.2f", shapeResult.getPerimeter()));
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Enter valid numbers");
+            showMessageDialog(this, "Enter valid numbers");
         } catch (IllegalComponentStateException e) {
-            JOptionPane.showMessageDialog(this, "Select a shape");
+            showMessageDialog(this, "Select a shape");
         }
     }
     private void clear() {
@@ -182,14 +201,18 @@ public class ShapePicker extends JFrame {
         this.heightField.setEditable(false);
         this.sideField.setEditable(false);
     }
+    // Private helper method for extracting number input
+    private double getInput(JTextField input) {
+        return Double.parseDouble(input.getText());
+    }
     private String getCurrentShape() {
+        // There's getSelectedObject(), but it returns Object which isn't very safe
         final int shapeIndex = this.shapes.getSelectedIndex();
 
         return this.options[shapeIndex];
     }
     public static void main(String[] args) {
-        ShapePicker gui = new ShapePicker();
-        gui.setVisible(true);
-        gui.setLocationRelativeTo(null);
+        ShapePicker window = new ShapePicker();
+        window.setVisible(true);
     }
 }
