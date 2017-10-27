@@ -8,13 +8,14 @@
    Revision History:
    Date:        By:             Action:
    ---------------------------------------------------
-   10/25/17     Joshua Stone    Initial commit
-   10/25/17     Joshua Stone    Added more labels for shapes
-   10/25/17     Joshua Stone    Added results labels and buttons
-   10/25/17     Joshua Stone    Implement calculate() logic and exception handling
-   10/25/17     Joshua Stone    Make a getCurrentShape() helper method
-   10/25/17     Joshua Stone    Add exception handling for invalid states
+   10/26/17     Joshua Stone    Initial commit
+   10/26/17     Joshua Stone    Added more labels for shapes
+   10/26/17     Joshua Stone    Added results labels and buttons
+   10/26/17     Joshua Stone    Implement calculate() logic and exception handling
+   10/26/17     Joshua Stone    Make a getCurrentShape() helper method
+   10/26/17     Joshua Stone    Add exception handling for invalid states
    10/27/17     Joshua Stone    Fix up UI code so it scales better with resizing
+   10/27/17     Joshua Stone    Clean up results field appearance
 */
 
 package assignment2;
@@ -81,12 +82,15 @@ public class ShapePicker extends JFrame {
         final JLabel shapeLabel = new JLabel("Shape is: ");
         this.shapeResult = new JTextField();
         this.shapeResult.setEditable(false);
+        this.shapeResult.setForeground(Color.BLUE);
         final JLabel areaLabel = new JLabel("Area is: ");
         this.areaResult = new JTextField();
         this.areaResult.setEditable(false);
-        final JLabel perimeterLabel = new JLabel("height: ");
+        this.areaResult.setForeground(Color.BLUE);
+        final JLabel perimeterLabel = new JLabel("Perimeter is: ");
         this.perimeterResult = new JTextField();
         this.perimeterResult.setEditable(false);
+        this.perimeterResult.setForeground(Color.BLUE);
 
         resultPanel.add(shapeLabel);
         resultPanel.add(this.shapeResult);
@@ -155,8 +159,8 @@ public class ShapePicker extends JFrame {
                 throw new IllegalComponentStateException();
             }
             this.shapeResult.setText(shapeResult.getName());
-            this.areaResult.setText(String.format("%f", shapeResult.getArea()));
-            this.perimeterResult.setText(String.format("%f", shapeResult.getPerimeter()));
+            this.areaResult.setText(String.format("%.2f", shapeResult.getArea()));
+            this.perimeterResult.setText(String.format("%.2f", shapeResult.getPerimeter()));
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Enter valid numbers");
         } catch (IllegalComponentStateException e) {
