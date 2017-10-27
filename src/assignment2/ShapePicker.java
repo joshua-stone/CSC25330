@@ -9,6 +9,7 @@
    Date:        By:             Action:
    ---------------------------------------------------
    10/25/17     Joshua Stone    Initial commit
+   10/25/17     Joshua Stone    Added more labels for shapes
 */
 
 package assignment2;
@@ -22,57 +23,71 @@ public class ShapePicker extends JFrame {
     private final JTextField height;
     private final JTextField side;
     private final JComboBox<String> shapes;
-
+    private final String options[];
     private ShapePicker() {
-        String options[] = {
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.options = new String[] {
+            "",
             "Circle",
             "Rectangle",
             "Square"
         };
+        final JPanel widgets = new JPanel(new GridLayout(5, 2));
 
-        final JPanel widgets = new JPanel(new GridLayout(5, 1));
-
+        final JLabel shapesLabel = new JLabel("Pick up one shape: ");
+        this.shapes = new JComboBox<>(options);
+        shapes.addActionListener(event -> this.setEdit());
+        final JLabel radiusLabel = new JLabel("radius: ");
         this.radius = new JTextField();
+        final JLabel widthLabel = new JLabel("width: ");
         this.width = new JTextField();
+        final JLabel heightLabel = new JLabel("height: ");
         this.height = new JTextField();
+        final JLabel sideLabel = new JLabel("side: ");
         this.side = new JTextField();
 
-
-        this.shapes = new JComboBox<>(options);
-
-        shapes.addActionListener(event -> this.setEdit());
-
+        widgets.add(shapesLabel);
         widgets.add(shapes);
+        widgets.add(radiusLabel);
         widgets.add(this.radius);
+        widgets.add(widthLabel);
         widgets.add(this.width);
+        widgets.add(heightLabel);
         widgets.add(this.height);
-        widgets.add(side);
+        widgets.add(sideLabel);
+        widgets.add(this.side);
 
         final JPanel rootPane = new JPanel(new BorderLayout());
-        rootPane.add(widgets, BorderLayout.NORTH);
-        this.setEdit();
+        rootPane.add(widgets, BorderLayout.CENTER);
+
         this.add(rootPane);
+        this.clear();
         this.pack();
     }
     private void setEdit() {
-        String currentShape = this.shapes.getSelectedItem().toString();
+        final int shapeIndex = this.shapes.getSelectedIndex();
+        final String currentShape = this.options[shapeIndex];
 
-        if (currentShape.equals("Circle")) {
-            this.radius.setEditable(true);
-            this.width.setEditable(false);
-            this.height.setEditable(false);
-            this.side.setEditable(false);
-        } else if (currentShape.equals("Rectangle")){
-            this.radius.setEditable(false);
-            this.width.setEditable(true);
-            this.height.setEditable(true);
-            this.side.setEditable(false);
-        } else {
-            this.radius.setEditable(false);
-            this.width.setEditable(false);
-            this.height.setEditable(false);
-            this.side.setEditable(true);
+        this.clear();
+
+        switch (currentShape) {
+            case "Circle":            // If circle, then set radius as editable
+                this.radius.setEditable(true);
+                break;
+            case "Rectangle":  // If rectangle, then set width and height as editable
+                this.width.setEditable(true);
+                this.height.setEditable(true);
+                break;
+            case "Square":    // Else, assume square is picked and set side as editable
+                this.side.setEditable(true);
+                break;
         }
+    }
+    private void clear() {
+        this.radius.setEditable(false);
+        this.width.setEditable(false);
+        this.height.setEditable(false);
+        this.side.setEditable(false);
     }
     public static void main(String[] args) {
         ShapePicker gui = new ShapePicker();
