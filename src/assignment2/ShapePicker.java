@@ -14,6 +14,7 @@
    10/25/17     Joshua Stone    Implement calculate() logic and exception handling
    10/25/17     Joshua Stone    Make a getCurrentShape() helper method
    10/25/17     Joshua Stone    Add exception handling for invalid states
+   10/27/17     Joshua Stone    Fix up UI code so it scales better with resizing
 */
 
 package assignment2;
@@ -35,6 +36,7 @@ public class ShapePicker extends JFrame {
     private final JTextField perimeterResult;
     private final JComboBox<String> shapes;
     private final String options[];
+
     private ShapePicker() {
         this.setTitle("GUI Application");
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -48,7 +50,7 @@ public class ShapePicker extends JFrame {
         this.shapes = new JComboBox<>(options);
         shapes.addActionListener(event -> this.setEdit());
 
-        final JPanel shapePickerPanel = new JPanel(new GridLayout(1, 2));
+        final JPanel shapePickerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         shapePickerPanel.add(shapesLabel);
         shapePickerPanel.add(shapes);
 
@@ -73,7 +75,7 @@ public class ShapePicker extends JFrame {
         inputPanel.add(sideLabel);
         inputPanel.add(this.sideField);
 
-        final JPanel resultPanel = new JPanel(new GridLayout(5, 2));
+        final JPanel resultPanel = new JPanel(new GridLayout(3, 2));
         resultPanel.setBorder(BorderFactory.createTitledBorder("Result:"));
 
         final JLabel shapeLabel = new JLabel("Shape is: ");
@@ -93,6 +95,7 @@ public class ShapePicker extends JFrame {
         resultPanel.add(perimeterLabel);
         resultPanel.add(this.perimeterResult);
 
+        resultPanel.setPreferredSize(resultPanel.getPreferredSize());
         final JButton getButton = new JButton("Get");
         getButton.addActionListener(event -> this.calculate());
 
@@ -108,15 +111,15 @@ public class ShapePicker extends JFrame {
         buttonPanel.add(clearButton);
         buttonPanel.add(exitButton);
 
-        final JPanel fieldsPanel = new JPanel(new GridLayout(2, 1));
+        final JPanel middlePanel = new JPanel(new GridLayout(2, 1));
 
-        fieldsPanel.add(inputPanel);
-        fieldsPanel.add(resultPanel);
+        middlePanel.add(inputPanel);
+        middlePanel.add(resultPanel);
 
         final JPanel rootPanel = new JPanel(new BorderLayout());
 
         rootPanel.add(shapePickerPanel, BorderLayout.NORTH);
-        rootPanel.add(fieldsPanel, BorderLayout.CENTER);
+        rootPanel.add(middlePanel, BorderLayout.CENTER);
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         this.add(rootPanel);
