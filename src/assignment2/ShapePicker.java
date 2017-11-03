@@ -38,6 +38,7 @@ import javax.swing.JTextField;
 import assignment1.Circle;
 import assignment1.GeometricObject;
 import assignment1.Rectangle;
+import assignment1.Square;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.String.format;
@@ -64,6 +65,7 @@ public class ShapePicker extends JFrame {
         };
         final JLabel shapesLabel = new JLabel("Pick up one shape: ");
         this.shapes = new JComboBox<>(options);
+        // Upon selecting a shape, set the relevant input fields
         shapes.addActionListener(event -> this.setEdit());
 
         // Start of top panel
@@ -76,13 +78,13 @@ public class ShapePicker extends JFrame {
         inputPanel.setBorder(createTitledBorder("Input Data:"));
 
         final JLabel radiusLabel = new JLabel("radius: ");
-        this.radiusField = new JTextField();
+        this.radiusField = new JTextField(25);
         final JLabel widthLabel = new JLabel("width: ");
-        this.widthField = new JTextField();
+        this.widthField = new JTextField(25);
         final JLabel heightLabel = new JLabel("height: ");
-        this.heightField = new JTextField();
+        this.heightField = new JTextField(25);
         final JLabel sideLabel = new JLabel("side: ");
-        this.sideField = new JTextField();
+        this.sideField = new JTextField(25);
 
         inputPanel.add(radiusLabel);
         inputPanel.add(this.radiusField);
@@ -92,24 +94,24 @@ public class ShapePicker extends JFrame {
         inputPanel.add(this.heightField);
         inputPanel.add(sideLabel);
         inputPanel.add(this.sideField);
-
+        // Make sure all input fields are disabled by default
+        this.disableEdit();
         // Second part of middle panel
         final JPanel resultPanel = new JPanel(new GridLayout(3, 2));
         resultPanel.setBorder(createTitledBorder("Result:"));
 
         final JLabel shapeLabel = new JLabel("Shape is: ");
-        this.shapeResult = new JTextField();
+        this.shapeResult = new JTextField(25);
         this.shapeResult.setEditable(false);
         this.shapeResult.setForeground(Color.BLUE);
         final JLabel areaLabel = new JLabel("Area is: ");
-        this.areaResult = new JTextField();
+        this.areaResult = new JTextField(25);
         this.areaResult.setEditable(false);
         this.areaResult.setForeground(Color.BLUE);
         final JLabel perimeterLabel = new JLabel("Perimeter is: ");
-        this.perimeterResult = new JTextField();
+        this.perimeterResult = new JTextField(25);
         this.perimeterResult.setEditable(false);
         this.perimeterResult.setForeground(Color.BLUE);
-
 
         resultPanel.add(shapeLabel);
         resultPanel.add(this.shapeResult);
@@ -126,14 +128,18 @@ public class ShapePicker extends JFrame {
 
         // Start of final panel
         final JButton getButton = new JButton("Get");
+        // Attempt to put shape dimensions, area, and perimeter in result labels
         getButton.addActionListener(event -> this.calculate());
 
         final JButton clearButton = new JButton("Clear");
+        // Clear all input and results upon clicking
         clearButton.addActionListener(event -> this.clear());
 
         final JButton exitButton = new JButton("Exit");
+        // Tear down window upon clicking
         exitButton.addActionListener(event -> this.dispose());
 
+        // Make a row of buttons
         final JPanel buttonPanel = new JPanel(new FlowLayout());
 
         buttonPanel.add(getButton);
@@ -146,7 +152,6 @@ public class ShapePicker extends JFrame {
         rootPanel.add(shapePickerPanel, BorderLayout.NORTH);
         rootPanel.add(middlePanel, BorderLayout.CENTER);
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
-
         // Finally initialize a frame with the final panel
         this.init(rootPanel);
     }
@@ -156,14 +161,14 @@ public class ShapePicker extends JFrame {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.add(panel);
-        this.disableEdit();
         this.pack();
     }
     private void setEdit() {
         // Disabling all text fields beforehand ensures none are left editable
         this.disableEdit();
 
-        // Now conditionally re-enable fields
+        // Now conditionally re-enable fields. Spec doesn't specify whether to also clear fields, so they'll be left
+        // alone as there's already a Clear button.
         switch (this.getCurrentShape()) {
             case "CIRCLE":
                 this.radiusField.setEditable(true);
@@ -189,8 +194,20 @@ public class ShapePicker extends JFrame {
                     shapeResult = new Rectangle(this.getInput(this.widthField), this.getInput(this.heightField));
                     break;
                 case "SQUARE":
-                    // Specs didn't say whether to have a dedicated Square class, so Rectangle is being reused
-                    shapeResult = new Rectangle(this.getInput(this.sideField), this.getInput(this.sideField));
+                    // I didn't find a requirement for a Square class in Assignment 1, so here's an implementation:
+                    /*
+                    public class Square extends Rectangle {
+                        public Square(final double side) {
+                            super(side, side);
+                        }
+                        @Override
+                        public String getName() {
+                            return String.format("[Square] side = %.1f",
+                                                 this.getWidth());
+                        }
+                    }
+                    */
+                    shapeResult = new Square(this.getInput(this.sideField));
                     break;
                 default:
                     // Throw an exception if no shape was selected
