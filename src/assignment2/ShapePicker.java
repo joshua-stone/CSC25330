@@ -18,6 +18,7 @@
    10/27/17     Joshua Stone    Clean up results field appearance
    10/27/17     Joshua Stone    More syntax cleanups
    10/27/17     Joshua Stone    Change import statements to be more explicit
+   11/02/17     Joshua Stone    Move window creation logic into its own method
 */
 
 package assignment2;
@@ -38,8 +39,11 @@ import assignment1.Circle;
 import assignment1.GeometricObject;
 import assignment1.Rectangle;
 
-import static javax.swing.JOptionPane.showMessageDialog;
+import static java.lang.Double.parseDouble;
+import static java.lang.String.format;
 import static javax.swing.BorderFactory.createTitledBorder;
+import static javax.swing.JOptionPane.showMessageDialog;
+
 
 public class ShapePicker extends JFrame {
     private final JTextField radiusField;
@@ -53,9 +57,6 @@ public class ShapePicker extends JFrame {
     private final String[] options;
 
     private ShapePicker() {
-        this.setTitle("GUI Application");
-        this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.options = new String[] {
             "",
             "CIRCLE",
@@ -140,13 +141,21 @@ public class ShapePicker extends JFrame {
         rootPanel.add(middlePanel, BorderLayout.CENTER);
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        this.add(rootPanel);
+        this.init(rootPanel);
+    }
+    private void init(final JPanel panel) {
+        this.setTitle("GUI Application");
+        this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.add(panel);
         this.disableEdit();
         this.pack();
     }
     private void setEdit() {
+        // Disabling all text fields beforehand ensures none are left editable
         this.disableEdit();
 
+        // Now conditionally re-enable fields
         switch (this.getCurrentShape()) {
             case "CIRCLE":
                 this.radiusField.setEditable(true);
@@ -161,10 +170,9 @@ public class ShapePicker extends JFrame {
     }
     private void calculate() {
         final GeometricObject shapeResult;
-        final String selectedShape = this.getCurrentShape();
 
         try {
-            switch (selectedShape) {
+            switch (this.getCurrentShape()) {
                 case "CIRCLE":
                     shapeResult = new Circle(this.getInput(this.radiusField));
                     break;
@@ -178,8 +186,8 @@ public class ShapePicker extends JFrame {
                     throw new IllegalComponentStateException();
             }
             this.shapeResult.setText(shapeResult.getName());
-            this.areaResult.setText(String.format("%.2f", shapeResult.getArea()));
-            this.perimeterResult.setText(String.format("%.2f", shapeResult.getPerimeter()));
+            this.areaResult.setText(format("%.2f", shapeResult.getArea()));
+            this.perimeterResult.setText(format("%.2f", shapeResult.getPerimeter()));
         } catch (NumberFormatException e) {
             showMessageDialog(this, "Enter valid numbers");
         } catch (IllegalComponentStateException e) {
@@ -187,6 +195,7 @@ public class ShapePicker extends JFrame {
         }
     }
     private void clear() {
+        // All text fields should be set to empty once called
         this.radiusField.setText("");
         this.widthField.setText("");
         this.heightField.setText("");
@@ -196,14 +205,15 @@ public class ShapePicker extends JFrame {
         this.perimeterResult.setText("");
     }
     private void disableEdit() {
+        // Disable all relevant text fields
         this.radiusField.setEditable(false);
         this.widthField.setEditable(false);
         this.heightField.setEditable(false);
         this.sideField.setEditable(false);
     }
     // Private helper method for extracting number input
-    private double getInput(JTextField input) {
-        return Double.parseDouble(input.getText());
+    private double getInput(final JTextField input) {
+        return parseDouble(input.getText());
     }
     private String getCurrentShape() {
         // There's getSelectedObject(), but it returns Object which isn't very safe
