@@ -2,8 +2,8 @@
    Program: ShapePicker.java
    Written by: Joshua Stone
    Description: A GUI program for calculating area and perimeter based on which shape is picked
-   Challenges:
-   Time Spent:
+   Challenges: Reasoning the cleanest way to structure window logic
+   Time Spent: 4 hours
 
    Revision History:
    Date:        By:             Action:
@@ -44,7 +44,6 @@ import static java.lang.String.format;
 import static javax.swing.BorderFactory.createTitledBorder;
 import static javax.swing.JOptionPane.showMessageDialog;
 
-
 public class ShapePicker extends JFrame {
     private final JTextField radiusField;
     private final JTextField widthField;
@@ -67,10 +66,12 @@ public class ShapePicker extends JFrame {
         this.shapes = new JComboBox<>(options);
         shapes.addActionListener(event -> this.setEdit());
 
+        // Start of top panel
         final JPanel shapePickerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         shapePickerPanel.add(shapesLabel);
-        shapePickerPanel.add(shapes);
+        shapePickerPanel.add(this.shapes);
 
+        // First part of middle panel
         final JPanel inputPanel = new JPanel(new GridLayout(4, 2));
         inputPanel.setBorder(createTitledBorder("Input Data:"));
 
@@ -92,6 +93,7 @@ public class ShapePicker extends JFrame {
         inputPanel.add(sideLabel);
         inputPanel.add(this.sideField);
 
+        // Second part of middle panel
         final JPanel resultPanel = new JPanel(new GridLayout(3, 2));
         resultPanel.setBorder(createTitledBorder("Result:"));
 
@@ -108,6 +110,7 @@ public class ShapePicker extends JFrame {
         this.perimeterResult.setEditable(false);
         this.perimeterResult.setForeground(Color.BLUE);
 
+
         resultPanel.add(shapeLabel);
         resultPanel.add(this.shapeResult);
         resultPanel.add(areaLabel);
@@ -115,6 +118,13 @@ public class ShapePicker extends JFrame {
         resultPanel.add(perimeterLabel);
         resultPanel.add(this.perimeterResult);
 
+        // Put input and results together
+        final JPanel middlePanel = new JPanel(new GridLayout(2, 1));
+
+        middlePanel.add(inputPanel);
+        middlePanel.add(resultPanel);
+
+        // Start of final panel
         final JButton getButton = new JButton("Get");
         getButton.addActionListener(event -> this.calculate());
 
@@ -130,20 +140,18 @@ public class ShapePicker extends JFrame {
         buttonPanel.add(clearButton);
         buttonPanel.add(exitButton);
 
-        final JPanel middlePanel = new JPanel(new GridLayout(2, 1));
-
-        middlePanel.add(inputPanel);
-        middlePanel.add(resultPanel);
-
+        // Now put all panels together
         final JPanel rootPanel = new JPanel(new BorderLayout());
 
         rootPanel.add(shapePickerPanel, BorderLayout.NORTH);
         rootPanel.add(middlePanel, BorderLayout.CENTER);
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
 
+        // Finally initialize a frame with the final panel
         this.init(rootPanel);
     }
     private void init(final JPanel panel) {
+        // Window creation logic can be separated from GUI components
         this.setTitle("GUI Application");
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -168,6 +176,7 @@ public class ShapePicker extends JFrame {
                 this.sideField.setEditable(true);
         }
     }
+    // For the "Get" button
     private void calculate() {
         final GeometricObject shapeResult;
 
@@ -180,22 +189,27 @@ public class ShapePicker extends JFrame {
                     shapeResult = new Rectangle(this.getInput(this.widthField), this.getInput(this.heightField));
                     break;
                 case "SQUARE":
+                    // Specs didn't say whether to have a dedicated Square class, so Rectangle is being reused
                     shapeResult = new Rectangle(this.getInput(this.sideField), this.getInput(this.sideField));
                     break;
                 default:
+                    // Throw an exception if no shape was selected
                     throw new IllegalComponentStateException();
             }
             this.shapeResult.setText(shapeResult.getName());
             this.areaResult.setText(format("%.2f", shapeResult.getArea()));
             this.perimeterResult.setText(format("%.2f", shapeResult.getPerimeter()));
         } catch (NumberFormatException e) {
+            // Shown if input can't be parsed into doubles
             showMessageDialog(this, "Enter valid numbers");
         } catch (IllegalComponentStateException e) {
+            // Shown if no shape was selected
             showMessageDialog(this, "Select a shape");
         }
     }
+    // For the "Clear" button
     private void clear() {
-        // All text fields should be set to empty once called
+        // All text fields should be set to empty
         this.radiusField.setText("");
         this.widthField.setText("");
         this.heightField.setText("");
