@@ -39,7 +39,7 @@ public class OvalDisplay extends JFrame {
     private final int y;
     private final int width;
     private final int height;
-    private final JPanel oval;
+    private final JPanel ovalPanel;
     private Color ovalColor;
 
     public OvalDisplay(final int x, final int y, final int width, final int height) {
@@ -48,7 +48,7 @@ public class OvalDisplay extends JFrame {
         this.width = width;
         this.height = height;
 
-        this.oval = new JPanel(new BorderLayout()) {
+        this.ovalPanel = new JPanel(new BorderLayout()) {
             // paint() draws graphics in a JPanel
             public void paint(final Graphics g) {
                 super.paint(g);
@@ -60,8 +60,8 @@ public class OvalDisplay extends JFrame {
         final JButton colorPicker = new JButton("Change color");
         colorPicker.addActionListener(event -> this.openColorPicker());
         // Add color picker button to bottom
-        this.oval.add(colorPicker, BorderLayout.SOUTH);
-
+        this.ovalPanel.add(colorPicker, BorderLayout.SOUTH);
+        // Default color
         this.setColor(Color.lightGray);
     }
     private void setColor(final Color color) {
@@ -71,7 +71,7 @@ public class OvalDisplay extends JFrame {
             this.ovalColor = Color.lightGray;
         }
         // Manually call repaint() so new panel can be updated with new colors
-        this.oval.repaint();
+        this.ovalPanel.repaint();
     }
     private void openColorPicker() {
         // Returns null if no color was picked
@@ -102,7 +102,7 @@ public class OvalDisplay extends JFrame {
         this.setSize(375, 375);
         // Put window in the center of the screen
         this.setLocationRelativeTo(null);
-        this.add(this.oval);
+        this.add(this.ovalPanel);
         this.setVisible(true);
     }
     public static void main(final String[] args) {
