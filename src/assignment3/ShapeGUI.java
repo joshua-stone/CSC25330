@@ -23,18 +23,24 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-interface ButtonGroupAction {
+interface SetString {
     void setValue(final String value);
 }
-interface TickboxAction {
+interface SetBool {
     void setValue(final boolean value);
 }
 class JMenuCustom extends JMenu {
     public JMenuCustom(final String name) {
         super(name);
     }
-    public void addRadioButtonGroup(final String defaultValue, final ButtonGroupAction function, final String... items) {
-        this.removeAll();
+    public void addMenuItems(final SetString function, final String... items) {
+        for (final String item : items) {
+            JMenuItem menuItem = new JMenuItem(item);
+            menuItem.addActionListener(event -> function.setValue(item));
+            this.add(menuItem);
+        }
+    }
+    public void addRadioButtonGroup(final String defaultValue, final SetString function, final String... items) {
         final ButtonGroup radioButtonGroup = new ButtonGroup();
 
         for (final String item : items) {
@@ -48,7 +54,7 @@ class JMenuCustom extends JMenu {
             this.add(radioButton);
         }
     }
-    public void addCheckBox(final String item, final TickboxAction function, final boolean defaultValue) {
+    public void addCheckBox(final String item, final SetBool function, final boolean defaultValue) {
             JCheckBox checkbox = new JCheckBox(item);
             checkbox.addActionListener(event -> function.setValue(checkbox.isSelected()));
             checkbox.setSelected(defaultValue);
@@ -64,9 +70,11 @@ public class ShapeGUI extends JFrame {
     private String font;
     private String backgroundColor;
     private boolean bold;
+    private boolean italic;
     private JMenuCustom colorMenu;
     private JMenuCustom fontMenu;
     private JMenuCustom backgroundMenu;
+
     public ShapeGUI() {
         this.shape = "circle";
 
@@ -78,26 +86,19 @@ public class ShapeGUI extends JFrame {
                 setY1(event.getY());
             }
             public void mouseReleased(MouseEvent e) {
-                System.out.println(String.format("(%s, %s) %s %s %b", e.getX(), e.getY(), backgroundColor, font, bold));
+                System.out.println(String.format("(%s, %s) %s %s %s %b", e.getX(), e.getY(), shape, backgroundColor, font, bold));
             }
         });
-        JMenu drawMenu = new JMenu("Draw");
-        JMenu shapeMenu = new JMenu("Shape");
-        JMenuItem circle = new JMenuItem("Circle");
-        JMenuItem rectangle = new JMenuItem("Rectangle");
-        JMenuItem square = new JMenuItem("Square");
+        final JMenu drawMenu = new JMenu("Draw");
+        JMenuCustom shapeMenu = new JMenuCustom("Shape");
+        shapeMenu.addMenuItems(this::setShape,
+                               "Circle",
+                               "Rectangle",
+                               "Square");
 
-        circle.addActionListener(event -> this.setShape("circle"));
-        rectangle.addActionListener(event -> this.setShape("rectangle"));
-        square.addActionListener(event -> this.setShape("square"));
-
-        shapeMenu.add(circle);
-        shapeMenu.add(rectangle);
-        shapeMenu.add(square);
-
+        final JMenu textMenu = new JMenu("Text");
         drawMenu.add(shapeMenu);
 
-        JMenu textMenu = new JMenu("Text");
         this.colorMenu = new JMenuCustom("Color");
         this.colorMenu.addRadioButtonGroup("Black",
                                            this::setColor,
@@ -105,19 +106,23 @@ public class ShapeGUI extends JFrame {
                                            "Blue",
                                            "Red",
                                            "Green");
+
         this.fontMenu = new JMenuCustom("Font");
         this.fontMenu.addRadioButtonGroup(Font.SERIF,
                                           this::setFont,   // Clicking an item will set the font
                                           Font.SERIF,
                                           Font.MONOSPACED,
                                           Font.SANS_SERIF);
-        this.fontMenu.addCheckBox("Bold", this::setBold, true);
+        this.fontMenu.addSeparator();
+        this.fontMenu.addCheckBox("Bold", this::setBold, false);
+        this.fontMenu.addCheckBox("Italic", this::setItalic, true);
         this.backgroundMenu = new JMenuCustom("Background");
-        this.backgroundMenu.addRadioButtonGroup("White", this::setBackgroundColor,
+        this.backgroundMenu.addRadioButtonGroup("White",
+                                                this::setBackgroundColor,
                                            "White",
-                                           "Cyan",
-                                           "Yellow",
-                                           "Light_Gray");
+                                                "Cyan",
+                                                "Yellow",
+                                                "Light_Gray");
 
         textMenu.add(colorMenu);
         textMenu.addSeparator();
@@ -136,6 +141,9 @@ public class ShapeGUI extends JFrame {
     }
     private void setBold(final boolean isSelected) {
         this.bold = isSelected;
+    }
+    private void setItalic(final boolean isSelected) {
+        this.italic = isSelected;
     }
     private void setColor(final String color) {
         this.color = color;
