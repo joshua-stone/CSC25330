@@ -2,8 +2,8 @@
     Program: ShapeGUI.java
     Written by: Joshua Stone
     Description: A program that takes mouse clicks for input to display shapes and info on them, as well as setting colors
-    Challenges:
-    Time Spent:
+    Challenges: Making sure graphics will draw correctly and stay in sync with the bottom text
+    Time Spent: 8 hours
 
     Revision History:
     Date:        By:             Action:
