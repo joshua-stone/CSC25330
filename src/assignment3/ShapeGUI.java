@@ -11,9 +11,6 @@
     11/17/17     Joshua Stone    Initial commit
     11/17/17     Joshua Stone    Add mouse listener
     11/17/17     Joshua Stone    Add initial menus
-    11/18/17     Joshua Stone    Add radio group function for font menu
-    11/18/17     Joshua Stone    Use Java 8 lambdas and functional interfaces to reuse menu creation code
-    11/18/17     Joshua Stone    Implement custom JMenu class for easier menu creation
     11/25/17     Joshua Stone    Rewrite functions for better argument ordering
     11/25/17     Joshua Stone    Implement text placement with foreground, background, and font setting
     11/25/17     Joshua Stone    Implement JComboBox shape options
@@ -22,20 +19,18 @@
     11/25/17     Joshua Stone    Create methods for returning top-left and bottom-right coordinates
     11/25/17     Joshua Stone    Made graphics drawing account for mouse release coordinates being set at different positions
     11/26/17     Joshua Stone    Adding in documentation and fixing up code structure
+    12/01/17     Joshua Stone    Add serialVersionUID to pass java linting
 */
 
 package assignment3;
 
 import javax.swing.JButton;
-import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextArea;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -45,60 +40,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
-import assignment1.Circle;
-import assignment1.Rectangle;
-
 import static java.lang.String.format;
 import static javax.swing.JColorChooser.showDialog;
 
-// Interface for passing a setter as a parameter in addMenuItem() or addRadioButtonGroup()
-interface SetString {
-    void setValue(final String value);
-}
-// Interface for passing a setter as a parameter in addCheckBox()
-interface SetBool {
-    void setValue(final boolean value);
-}
-// Swing doesn't seem to have a very expressive API for creating menus, so a custom JMenu is made to reduce boilerplate
-// in ShapeGUI constructor
-class JMenuCustom extends JMenu {
-    public JMenuCustom(final String name) {
-        super(name);
-    }
-    // Simple menu item creation function that'll create an item that calls a function when pressed
-    public void addMenuItem(final String item, final SetString function) {
-        JMenuItem menuItem = new JMenuItem(item);
-        menuItem.addActionListener(event -> function.setValue(item));
-        this.add(menuItem);
-    }
-    // Method for programmatically creating a radio buttons that share a common setter method
-    public void addRadioButtonGroup(final String[] items, final SetString function, final String defaultValue) {
-        final ButtonGroup radioButtonGroup = new ButtonGroup();
-
-        for (final String item : items) {
-            JRadioButtonMenuItem radioButton = new JRadioButtonMenuItem(item);
-            // If default value matches any item, then select the radio button and attempt to execute the method so
-            // values are kept in sync
-            if (item.equals(defaultValue)) {
-                radioButton.setSelected(true);
-                function.setValue(defaultValue);
-            }
-            radioButton.addActionListener(event -> function.setValue(item));
-            radioButtonGroup.add(radioButton);
-            this.add(radioButton);
-        }
-    }
-    public void addCheckBox(final String item, final SetBool function, final boolean defaultValue) {
-            JCheckBox checkbox = new JCheckBox(item);
-            checkbox.addActionListener(event -> function.setValue(checkbox.isSelected()));
-            // Set checkbox with default value
-            checkbox.setSelected(defaultValue);
-            // Also use the setter method to set outside value so they're in sync
-            function.setValue(defaultValue);
-            this.add(checkbox);
-    }
-}
+// Main shape class where GUI construction and drawing takes place
 public class ShapeGUI extends JFrame {
+    // Set a serial version ID
+    private static final long serialVersionUID = 1L;
     private int mousePressedX;
     private int mousePressedY;
     private int mouseReleasedX;
@@ -110,9 +58,6 @@ public class ShapeGUI extends JFrame {
     private final JButton colorPicker;
     private final JComboBox<String> shapePicker;
     private final JMenuBar menuBar;
-    private final JMenuCustom textColorMenu;
-    private final JMenuCustom textFontMenu;
-    private final JMenuCustom textBackgroundMenu;
     private final String[] shapeOptions;
     private final JPanel shapePanel;
     private final JTextArea shapeText;
@@ -120,12 +65,12 @@ public class ShapeGUI extends JFrame {
 
     public ShapeGUI() {
         // Set initial X and Y values
-        this.setMousePressedX(0);
-        this.setMousePressedY(0);
-        this.setMouseReleasedX(0);
-        this.setMouseReleasedY(0);
+        this.setMousePressedCoordinates(0, 0);
+        this.setMouseReleasedCoordinates(0, 0);
 
         this.shapePanel = new JPanel(new BorderLayout()) {
+            // Set a serial version ID
+            private static final long serialVersionUID = 1L;
             // paintComponent() updates graphics for shapePanel
             public void paintComponent(final Graphics g) {
                 super.paintComponent(g);
@@ -164,21 +109,18 @@ public class ShapeGUI extends JFrame {
         // set (x2, y2)
         this.shapePanel.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent event) {
-                setMousePressedX(event.getX());
-                setMousePressedY(event.getY());
+                setMousePressedCoordinates(event.getX(), event.getY());
             }
             public void mouseReleased(MouseEvent event) {
-                setMouseReleasedX(event.getX());
-                setMouseReleasedY(event.getY());
+                setMouseReleasedCoordinates(event.getX(), event.getY());
                 setShape();
-                shapePanel.repaint();
             }
         });
         this.shapePanel.setBackground(Color.LIGHT_GRAY);
 
         final JMenu drawMenu = new JMenu("Draw");
 
-        JMenuCustom shapeMenu = new JMenuCustom("Shape");
+        final JMenuCustom shapeMenu = new JMenuCustom("Shape");
         // Set shameMenu to have three shapes that can be selected to set shape being drawn
         shapeMenu.addMenuItem("Circle", this::setShape);
         shapeMenu.addMenuItem("Rectangle", this::setShape);
@@ -191,7 +133,7 @@ public class ShapeGUI extends JFrame {
         this.shapeText = new JTextArea();
         this.shapeText.setEditable(false);
 
-        this.textColorMenu = new JMenuCustom("Color");
+        final JMenuCustom textColorMenu = new JMenuCustom("Color");
 
         String[] textColors = {
                 "Black",
@@ -200,9 +142,9 @@ public class ShapeGUI extends JFrame {
                 "Green"
         };
         // Create a radio button group where selecting a value will set the text color, with default value being Black
-        this.textColorMenu.addRadioButtonGroup(textColors, this::setTextColor, "Black");
+        textColorMenu.addRadioButtonGroup(textColors, this::setTextColor, "Black");
 
-        this.textFontMenu = new JMenuCustom("Font");
+        final JMenuCustom textFontMenu = new JMenuCustom("Font");
 
         final String[] fonts = {
                 Font.SERIF,
@@ -210,13 +152,13 @@ public class ShapeGUI extends JFrame {
                 Font.SANS_SERIF
         };
         // Create a radio button group where selecting a value will set the font, with default value being Serif
-        this.textFontMenu.addRadioButtonGroup(fonts, this::setFontName, Font.SERIF);
-        this.textFontMenu.addSeparator();
+        textFontMenu.addRadioButtonGroup(fonts, this::setFontName, Font.SERIF);
+        textFontMenu.addSeparator();
         // Add checkboxes for setting bold and italic styles
-        this.textFontMenu.addCheckBox("Bold", this::setBold, false);
-        this.textFontMenu.addCheckBox("Italic", this::setItalic, false);
+        textFontMenu.addCheckBox("Bold", this::setBold, false);
+        textFontMenu.addCheckBox("Italic", this::setItalic, false);
 
-        this.textBackgroundMenu = new JMenuCustom("Background");
+        final JMenuCustom textBackgroundMenu = new JMenuCustom("Background");
 
         final String[] backgroundColors = {
             "White",
@@ -225,7 +167,7 @@ public class ShapeGUI extends JFrame {
             "Light_Gray"
         };
         // Radio button group that sets the text area's background color, with default being White
-        this.textBackgroundMenu.addRadioButtonGroup(backgroundColors, this::setTextBackgroundColor, "White");
+        textBackgroundMenu.addRadioButtonGroup(backgroundColors, this::setTextBackgroundColor, "White");
 
         // Add all submenus into textMenu
         textMenu.add(textColorMenu);
@@ -250,11 +192,11 @@ public class ShapeGUI extends JFrame {
         this.shapePicker.addActionListener(event -> this.setShape());
         // Clicking a button will open a color picker dialog for setting shape color
         this.colorPicker = new JButton("Pick Color");
-        colorPicker.addActionListener(event-> this.openColorPicker());
+        this.colorPicker.addActionListener(event-> this.openColorPicker());
         // Ticking the checkbox will fill the shape being drawn
         this.filledCheckBox = new JCheckBox("Filled");
-        filledCheckBox.addActionListener(event -> this.shapePanel.repaint());
-        filledCheckBox.setBackground(Color.WHITE);
+        this.filledCheckBox.addActionListener(event -> this.shapePanel.repaint());
+        this.filledCheckBox.setBackground(Color.WHITE);
 
         // Create final part of GUI that contains the widgets for setting shape, shape color, and whether to fill shape
         final JPanel buttonPanel = new JPanel();
@@ -311,28 +253,28 @@ public class ShapeGUI extends JFrame {
     private void setShapeColor(final Color shapeColor) {
         if (shapeColor != null) {
             this.shapeColor = shapeColor;
-        } else {
-            this.shapeColor = Color.LIGHT_GRAY;
+            // Manually call repaint() so new panel can be updated with new color
+            this.shapePanel.repaint();
         }
-        // Manually call repaint() so new panel can be updated with new colors
-        this.shapePanel.repaint();
     }
     private void openColorPicker() {
         // Returns null if no color was picked
         final Color newColor = showDialog(this, "Choose a color", this.shapeColor);
 
-        this.setShapeColor(newColor);
+        // Making sure that a new color is selected prevents unnecessary repaints
+        if (!newColor.equals(this.shapeColor)) {
+            this.setShapeColor(newColor);
+            System.out.println("update");
+        }
     }
-    private void setMousePressedX(final int x) {
+    // Sets the coordinates from a mouse press event
+    private void setMousePressedCoordinates(final int x, final int y) {
         this.mousePressedX = x;
-    }
-    private void setMousePressedY(final int y) {
         this.mousePressedY = y;
     }
-    private void setMouseReleasedX(final int x) {
+    // Sets the mouse coordinates from a mouse release event
+    private void setMouseReleasedCoordinates(final int x, final int y) {
         this.mouseReleasedX = x;
-    }
-    private void setMouseReleasedY(final int y) {
         this.mouseReleasedY = y;
     }
     // Since mouse can be released from positions higher than when initially pressed, use a method to return the
@@ -392,7 +334,7 @@ public class ShapeGUI extends JFrame {
                 break;
             // Since the program is using only three shapes, this condition should never be reached
             default:
-                text = null;
+                text = "";
         }
         this.shapeText.setText(text);
         // Once text has been updated, display the appropriate shape
@@ -436,12 +378,12 @@ public class ShapeGUI extends JFrame {
                 break;
             // Considering the program is only using the above colors, the condition below should never be reached
             default:
-                colorCode = null;
+                colorCode = Color.GRAY;
         }
         return colorCode;
     }
     // Creates the main window and displays it in the middle of the screen
-    private void init() {
+    public void init() {
         this.setTitle("Drawing shapes and Displaying All Info");
         this.add(this.shapePanel);
         this.setJMenuBar(menuBar);
