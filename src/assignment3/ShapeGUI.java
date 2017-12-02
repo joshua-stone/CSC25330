@@ -20,6 +20,7 @@
     11/25/17     Joshua Stone    Made graphics drawing account for mouse release coordinates being set at different positions
     11/26/17     Joshua Stone    Adding in documentation and fixing up code structure
     12/01/17     Joshua Stone    Add serialVersionUID to pass java linting
+    12/01/17     Joshua Stone    Add fix for exception caused by .equals() taking a null value
 */
 
 package assignment3;
@@ -251,20 +252,19 @@ public class ShapeGUI extends JFrame {
         return this.shapeOptions[shapeIndex];
     }
     private void setShapeColor(final Color shapeColor) {
-        if (shapeColor != null) {
-            this.shapeColor = shapeColor;
-            // Manually call repaint() so new panel can be updated with new color
-            this.shapePanel.repaint();
-        }
+        this.shapeColor = shapeColor;
+        // Manually call repaint() so new panel can be updated with new color
+        this.shapePanel.repaint();
     }
     private void openColorPicker() {
         // Returns null if no color was picked
         final Color newColor = showDialog(this, "Choose a color", this.shapeColor);
 
-        // Making sure that a new color is selected prevents unnecessary repaints
-        if (!newColor.equals(this.shapeColor)) {
-            this.setShapeColor(newColor);
-            System.out.println("update");
+        if (newColor != null) {
+            // Making sure that a new color is selected prevents unnecessary repaints
+            if (!newColor.equals(this.shapeColor)) {
+                this.setShapeColor(newColor);
+            }
         }
     }
     // Sets the coordinates from a mouse press event
@@ -386,7 +386,7 @@ public class ShapeGUI extends JFrame {
     public void init() {
         this.setTitle("Drawing shapes and Displaying All Info");
         this.add(this.shapePanel);
-        this.setJMenuBar(menuBar);
+        this.setJMenuBar(this.menuBar);
         this.setSize(500, 500);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
