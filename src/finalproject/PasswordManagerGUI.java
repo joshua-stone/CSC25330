@@ -1,5 +1,5 @@
 /*
-    Program: ShapeGUI.java
+    Program: PasswordManagerStartup.java
     Written by: Joshua Stone
     Description:
     Challenges:
@@ -11,7 +11,11 @@
     11/17/17     Joshua Stone    Initial commit
     11/17/17     Joshua Stone    Add PasswordManagerGUI class
     11/17/17     Joshua Stone    Create startup dialog
+    11/17/17     Joshua Stone    Add reading from password file
+    11/17/17     Joshua Stone    Use checks for file existence at startup
     11/17/17     Joshua Stone
+    11/17/17     Joshua Stone
+
 */
 
 package finalproject;
@@ -21,27 +25,25 @@ import java.awt.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
 class ButtonEvent extends SwingWorker {
-    final private PasswordManagerGUI passwordManagerGUI;
+    private PasswordManagerGUI passwordManagerGUI;
     final private static long timeout = 2000;
     final JButton button;
     final byte[] encryptedBlob;
     final String password;
-    ByteArrayOutputStream decryptedBlob;
+    byte[] decryptedBlob;
     boolean isCorrect;
 
-    ButtonEvent(final PasswordManagerGUI passwordManagerGUI, final byte[] encryptedBlob, final JPasswordField password) {
+    ButtonEvent(PasswordManagerGUI passwordManagerGUI, final byte[] encryptedBlob, final JPasswordField password) {
         this.passwordManagerGUI = passwordManagerGUI;
         this.button = this.passwordManagerGUI.passwordButton;
         this.encryptedBlob = encryptedBlob;
         this.password = String.valueOf(password.getPassword());
     }
-    @Override
     protected Integer doInBackground() {
         this.button.setEnabled(false);
         try {
@@ -58,10 +60,10 @@ class ButtonEvent extends SwingWorker {
         }
         return 0;
     }
-    @Override
-    public void done() {
+    protected void done() {
         if (this.isCorrect) {
             this.passwordManagerGUI.dispose();
+            new PasswordManagerMainWindow(this.password, this.decryptedBlob);
         } else {
             JOptionPane.showMessageDialog(null, "Password not valid. Try again.");
             this.button.setEnabled(true);
@@ -70,13 +72,20 @@ class ButtonEvent extends SwingWorker {
 }
 
 public class PasswordManagerGUI extends JFrame {
+    protected JPanel masterPasswordStartupPanel;
     protected JButton passwordButton;
     private String passwordFileName = "passwords.properties";
+    private String fullPasswordFilePath;
+    private final File passwordFile;
     private JButton button;
     public PasswordManagerGUI() {
-        File passwordFile = new File(this.passwordFileName);
+        this.passwordFile = new File(this.passwordFileName);
 
-        if (passwordFile.exists() && passwordFile.canWrite()) {
+        try {
+            fullPasswordFilePath = this.passwordFile.getCanonicalPath();
+        } catch (IOException e) {
+        }
+        if (this.passwordFile.exists() && this.passwordFile.canWrite()) {
             this.enterMasterPassword();
         } else {
             final int value = JOptionPane.showConfirmDialog(null,
@@ -135,12 +144,12 @@ public class PasswordManagerGUI extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.add(button);
         buttonPanel.add(cancel);
-        JPanel root = new JPanel(new BorderLayout());
-        root.setBorder(new EmptyBorder(10, 10, 10, 10));
-        root.add(inputPanel, BorderLayout.CENTER);
-        root.add(buttonPanel, BorderLayout.SOUTH);
+        JPanel masterPasswordPanel = new JPanel(new BorderLayout());
+        masterPasswordPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        masterPasswordPanel.add(inputPanel, BorderLayout.CENTER);
+        masterPasswordPanel.add(buttonPanel, BorderLayout.SOUTH);
         this.setTitle("PasswordManager");
-        this.add(root);
+        this.add(masterPasswordPanel);
         this.pack();
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -149,11 +158,9 @@ public class PasswordManagerGUI extends JFrame {
     public void enterMasterPassword() {
         byte[] infile = Crypto.readFile(this.passwordFileName);
         JPanel inputPanel = new JPanel(new GridLayout(1,2));
-        JPanel passwordPanel = new JPanel(new GridLayout(2,2));
         JPasswordField password = new JPasswordField(10);
 
-
-        JLabel label1 = new JLabel("Enter master password:");
+        JLabel label1 = new JLabel("Enter password: ");
 
         inputPanel.add(label1);
         inputPanel.add(password);
@@ -183,12 +190,13 @@ public class PasswordManagerGUI extends JFrame {
         buttonPanel.add(passwordButton);
         buttonPanel.add(cancel);
 
-        JPanel root = new JPanel(new BorderLayout());
-        root.add(buttonPanel, BorderLayout.SOUTH);
-        root.add(inputPanel, BorderLayout.CENTER);
+        this.masterPasswordStartupPanel = new JPanel(new BorderLayout());
 
+        this.masterPasswordStartupPanel.add(inputPanel, BorderLayout.CENTER);
+        this.masterPasswordStartupPanel.add(buttonPanel, BorderLayout.SOUTH);
+        this.masterPasswordStartupPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         this.setTitle("PasswordManager");
-        this.add(root);
+        this.add(this.masterPasswordStartupPanel);
         this.pack();
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);

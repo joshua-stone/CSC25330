@@ -2,7 +2,6 @@ package finalproject;
 
 import java.io.*;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
@@ -31,7 +30,7 @@ public class Crypto {
         }
         return data;
     }
-    public static ByteArrayOutputStream fileDecrypt(final byte[] input, final String password) throws IOException {
+    public static byte[] fileDecrypt(final byte[] input, final String password) throws IOException {
             ByteArrayInputStream infile = new ByteArrayInputStream(input);
             byte[] salt = new byte[saltPad];
             byte[] iv = new byte[ivPad];
@@ -63,42 +62,8 @@ public class Crypto {
                 throw new IOException();
             }
 
-            return outputStream;
+            return outputStream.toByteArray();
     }
-
-    public static ByteArrayOutputStream fileDecrypt(final String inputFile, final String password) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        try (InputStream infile = new FileInputStream(inputFile)) {
-
-            byte[] salt = new byte[saltPad];
-            infile.read(salt);
-            byte[] iv = new byte[ivPad];
-            infile.read(iv);
-
-            SecretKey secret = getSecret(password, salt);
-
-            // file decryption
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
-
-            byte[] in = new byte[bufferSize];
-            int read;
-            while ((read = infile.read(in)) != -1) {
-                byte[] output = cipher.update(in, 0, read);
-                outputStream.write(output);
-            }
-
-            byte[] output = cipher.doFinal();
-            outputStream.write(output);
-            outputStream.flush();
-        } catch (Exception e) {
-
-        }
-        return outputStream;
-    }
-
-
     public static void fileEncrypt(final byte[] inputStream, final String outputFile, final String password) {
         try (FileOutputStream outFile = new FileOutputStream(outputFile)) {
 
