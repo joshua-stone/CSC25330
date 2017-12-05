@@ -1,18 +1,27 @@
+/*
+    Program: PasswordManagerStartup.java
+    Written by: Joshua Stone
+    Description:
+    Challenges:
+    Time Spent:
+
+    Revision History:
+    Date:        By:             Action:
+    ---------------------------------------------------
+    12/02/17     Joshua Stone    Initial commit
+*/
 package finalproject;
 
-import java.io.*;
-import java.io.RandomAccessFile;
-import java.security.*;
-import java.security.spec.InvalidParameterSpecException;
-import java.security.spec.KeySpec;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
+import java.security.*;
+import java.security.spec.InvalidParameterSpecException;
+import java.security.spec.KeySpec;
 
 public class Crypto {
-    private static final int saltOffset = 0;
-    private static final int ivOffset = 16;
     private static final int saltPad = 16;
     private static final int ivPad = 16;
     private static final int bufferSize = 64;
@@ -64,7 +73,7 @@ public class Crypto {
 
             return outputStream.toByteArray();
     }
-    public static void fileEncrypt(final byte[] inputStream, final String outputFile, final String password) {
+    public static void fileEncrypt(final byte[] inputStream, final String outputFile, final String password) throws IOException {
         try (FileOutputStream outFile = new FileOutputStream(outputFile)) {
 
             byte[] salt = getSalt();
@@ -85,14 +94,14 @@ public class Crypto {
             outFile.write(iv);
             outFile.write(encrypted);
 
-        } catch (Exception e) {
+        } catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | ShortBufferException e) {
 
         }
     }
     private static SecretKey getSecret(final String password, final byte[] salt) {
         SecretKey secret;
         try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
 
             KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, iterations, keyLength);
             SecretKey secretKey = factory.generateSecret(keySpec);
@@ -120,5 +129,15 @@ public class Crypto {
             iv = null;
         }
         return iv;
+    }
+    public static String randomString(int length) {
+        final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        SecureRandom rng = new SecureRandom();
+        char[] text = new char[length];
+        for (int i = 0; i < length; i++) {
+            text[i] = characters.charAt(rng.nextInt(characters.length()));
+        }
+        return new String(text);
     }
 }
