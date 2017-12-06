@@ -20,6 +20,7 @@
     12/05/17     Joshua Stone    Have an update() function to save state while typing
     12/05/17     Joshua Stone    Have save() to save and encrypt session data
     12/05/17     Joshua Stone    Have fields disabled until an item is selected
+    12/05/17     Joshua Stone    Add serialVersionUID for linting
 */
 
 package finalproject;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 public class PasswordManagerMainWindow extends JFrame {
+    private static final long serialVersionUID = 1L;
     private JTextField usernameField;
     private JPasswordField passwordField;
     protected ArrayList<String> labelList;

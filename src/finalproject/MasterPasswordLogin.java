@@ -15,9 +15,11 @@
     12/05/17     Joshua Stone    Implement a swing worker for checking password
     12/05/17     Joshua Stone    Disable GUI while checking password
     12/05/17     Joshua Stone    Clear password if login attempt fails
+    12/05/17     Joshua Stone    Add serialVersionUID for linting
 */
 package finalproject;
 
+import javax.crypto.BadPaddingException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -26,6 +28,7 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 public class MasterPasswordLogin extends JFrame {
+    private static final long serialVersionUID = 1L;
     final byte[] infile;
     final JPasswordField passwordField;
     final JButton passwordButton;
@@ -108,15 +111,27 @@ class ButtonEvent extends SwingWorker<Integer, Integer>  {
         try {
             this.decryptedBlob = Crypto.fileDecrypt(this.encryptedBlob, this.password);
             this.isCorrect = true;
-        } catch (IOException e) {
+        } catch (IOException e1) {
             try {
                 // If unlocking failed, pause for a moment to slow down attempts at brute forcing
-                Thread.sleep(this.timeout);
+                Thread.sleep(ButtonEvent.timeout);
             } catch(InterruptedException interrupted) {
-
+                System.out.println("Thread terminated prematurely");
             }
-            this.isCorrect = false;
 
+            this.isCorrect = false;
+        // If an obvious file error comes up that doesn't seem recoverable, then ask to make a new password store
+        } catch (BadPaddingException e2) {
+            final int value = JOptionPane.showConfirmDialog(null,
+                    "File corrupt. Create a master password?",
+                    "Corrupt new file",
+                    JOptionPane.OK_CANCEL_OPTION);
+            if (value != JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }  else {
+                this.masterPasswordLogin.dispose();
+                new CreateNewMasterPassword();
+            }
         }
         return 0;
     }
@@ -126,6 +141,7 @@ class ButtonEvent extends SwingWorker<Integer, Integer>  {
             this.masterPasswordLogin.dispose();
             new PasswordManagerMainWindow(this.password, this.decryptedBlob);
         } else {
+            // If password fails, reset password field and re-enable button
             JOptionPane.showMessageDialog(null, "Password not valid. Try again.");
             this.masterPasswordLogin.passwordField.setText("");
             this.button.setEnabled(true);

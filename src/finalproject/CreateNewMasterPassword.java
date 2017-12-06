@@ -27,6 +27,7 @@ import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
 public class CreateNewMasterPassword extends JFrame {
+    private static final long serialVersionUID = 1L;
     private JButton okButton;
     private JPasswordField passwordField;
     private JPasswordField passwordConfirmField;

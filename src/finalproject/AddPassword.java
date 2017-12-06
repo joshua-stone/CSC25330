@@ -15,6 +15,7 @@
     12/05/17     Joshua Stone    Have main window disabled to keep other data from being entered
     12/05/17     Joshua Stone    Add a random password generator
     12/05/17     Joshua Stone    Make sure all three fields have characters typed in
+    12/05/17     Joshua Stone    Add serialVersionUID for linting
 */
 package finalproject;
 
@@ -22,6 +23,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class AddPassword extends JFrame {
+    private static final long serialVersionUID = 1L;
     private final PasswordManagerMainWindow passwordManagerMainWindow;
     private final JTextField labelField;
     private final JTextField userField;

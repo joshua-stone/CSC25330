@@ -14,6 +14,7 @@
     12/05/17     Joshua Stone    Create simple password generator method using letters and numbers
     12/05/17     Joshua Stone    Implement methods that encrypt a file and can decrypt as well
     12/05/17     Joshua Stone    Stabilize final file format
+    12/05/17     Joshua Stone    Add check for signs of corruption
 
 */
 package finalproject;
@@ -24,6 +25,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 
@@ -32,53 +34,70 @@ public class Crypto {
     private static final int ivPad = 16;
     private static final int bufferSize = 64;
     private static final int iterations = 65536;
-    private static final int keyLength = 256;
-
+    private static final int keyLength = 128;
+    private static final String algorithm = "AES/CBC/PKCS5Padding";
+    // A method for reading a file into memory for further processing
     public static byte[] readFile(final String inputFile) {
-        byte[] data;
+        byte[] data = null;
 
-        try(RandomAccessFile input = new RandomAccessFile(inputFile, "r")) {
+        try(final RandomAccessFile input = new RandomAccessFile(inputFile, "r")) {
+            // Create a byte array of the same length as the file and read every byte into it
             data = new byte[(int)input.length()];
             input.readFully(data);
-        } catch (Exception e) {
-            data = null;
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+            System.exit(-1);
+        } catch (IOException e) {
+            System.out.println("Failed to read file");
+            System.exit(-1);
         }
         return data;
     }
-    public static byte[] fileDecrypt(final byte[] input, final String password) throws IOException {
+    public static byte[] fileDecrypt(final byte[] input, final String password) throws BadPaddingException, IOException {
             final ByteArrayInputStream infile = new ByteArrayInputStream(input);
             final byte[] salt = new byte[saltPad];
             final byte[] iv = new byte[ivPad];
 
-            infile.read(salt);
-            infile.read(iv);
+            // Read the first bytes of the byte array based on the size of the salt pad and iv pad
+            final int saltSize = infile.read(salt);
+            final int ivSize = infile.read(iv);
 
+            if (saltSize + ivSize < saltSize + ivPad) {
+                System.out.println("Salt and iv pads are too small");
+                System.exit(-1);
+            }
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             final SecretKey secret = getSecret(password, salt);
 
             Cipher cipher = null;
             try {
-                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                // https://docs.oracle.com/javase/9/docs/api/javax/crypto/Cipher.html
+                cipher = Cipher.getInstance(algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
             } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException e) {
+                // Many different exceptions can be caused from attempt to decrypt, so just fail if any occur
                 System.out.println("Invalid algorithm available");
                 System.exit(2);
             }
-            final byte[] in = new byte[bufferSize];
+            // File should be read in chunks
+            final byte[] chunk = new byte[bufferSize];
 
             int read;
-
-            while ((read = infile.read(in)) != -1) {
-                outputStream.write(cipher.update(in, 0, read));
+            // Returns the number of bytes read into chunks
+            while ((read = infile.read(chunk)) != -1) {
+                // Write out multi-part decryption to stream, with no offset
+                outputStream.write(cipher.update(chunk, 0, read));
             }
+            // Finalize multi-part decryption
             try {
                 final byte[] output = cipher.doFinal();
                 outputStream.write(output);
                 outputStream.flush();
-            } catch (BadPaddingException | IllegalBlockSizeException e) {
+            } catch (BadPaddingException e) {
+                throw new BadPaddingException();
+            } catch (IllegalBlockSizeException e) {
                 throw new IOException();
             }
-
             return outputStream.toByteArray();
     }
     public static void fileEncrypt(final byte[] inputStream, final String outputFile, final String password) throws IOException {
@@ -87,38 +106,42 @@ public class Crypto {
             final byte[] salt = getSalt();
 
             final SecretKey secret = getSecret(password, salt);
-
-            final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            // Use the same cipher for encryption and decryption
+            final Cipher cipher = Cipher.getInstance(algorithm);
             cipher.init(Cipher.ENCRYPT_MODE, secret);
 
             final byte[] iv = getIV(cipher);
             final byte[] encrypted = new byte[cipher.getOutputSize(inputStream.length)];
-
+            // Essentially do the opposite of fileDecrypt by turning plaintext into encrypted blocks
             int enc_len = cipher.update(inputStream, 0, inputStream.length, encrypted, 0);
-
+            // Finalize encryption
             cipher.doFinal(encrypted, enc_len);
-
+            // Write salt, iv, and encrypted stream to file
             outFile.write(salt);
             outFile.write(iv);
             outFile.write(encrypted);
 
         } catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | ShortBufferException e) {
-
+            System.out.println("Error in encrypting.");
         }
     }
+    // Generates a secret key
     private static SecretKey getSecret(final String password, final byte[] salt) {
-        SecretKey secret;
+        SecretKey secret = null;
+
         try {
             final SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-
+            // Use the password and random salt with key size and number of iterations to generate a secret
             final KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, iterations, keyLength);
             final SecretKey secretKey = factory.generateSecret(keySpec);
             secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
-        } catch (Exception e) {
-            secret = null;
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            System.out.println("Couldn't generate secret key");
+            System.exit(-1);
         }
         return secret;
     }
+    // Generates a random salt as a source of uniqueness
     private static byte[] getSalt() {
         final byte[] salt = new byte[saltPad];
 
@@ -127,17 +150,20 @@ public class Crypto {
 
         return salt;
     }
+    // Generate an initialization vector for increased uniqueness
     private static byte[] getIV(final Cipher cipher) {
-        byte[] iv;
+        byte[] iv = null;
         try {
             final AlgorithmParameters params = cipher.getParameters();
 
             iv = params.getParameterSpec(IvParameterSpec.class).getIV();
         } catch (InvalidParameterSpecException e) {
-            iv = null;
+            System.out.println("Couldn't generate IV");
+            System.exit(-1);
         }
         return iv;
     }
+    // A simple password generator that produces a string of random numbers and letters of a specified length
     public static String randomString(final int length) {
         final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -146,6 +172,6 @@ public class Crypto {
         for (int i = 0; i < length; i++) {
             text[i] = characters.charAt(rng.nextInt(characters.length()));
         }
-        return new String(text);
+        return String.valueOf(text);
     }
 }
