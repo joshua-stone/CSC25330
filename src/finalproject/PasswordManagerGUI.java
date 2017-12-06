@@ -1,9 +1,9 @@
 /*
     Program: PasswordManagerStartup.java
     Written by: Joshua Stone
-    Description:
-    Challenges:
-    Time Spent:
+    Description: A class which starts other parts of the PasswordManager program
+    Challenges: Finding how to reference other windows and start them based on different conditions
+    Time Spent: 1 hour
 
     Revision History:
     Date:        By:             Action:
@@ -24,20 +24,22 @@ package finalproject;
 import javax.swing.*;
 import java.io.File;
 
-public class PasswordManagerGUI extends JFrame {
-    private String passwordFileName = "test_file";
+public class PasswordManagerGUI {
+    private String passwordFileName = "passwordmanager.properties";
     private final File passwordFile;
     public PasswordManagerGUI() {
+        // Get a reference to a password file
         this.passwordFile = new File(this.passwordFileName);
 
         if (this.passwordFile.exists()) {
+            // Attempt to restore a previous session
             new MasterPasswordLogin(this.passwordFileName);
         } else {
+            // Else, prompt to make a new password
             final int value = JOptionPane.showConfirmDialog(null,
                     "Create a master password?",
                     "Password file not found",
                     JOptionPane.OK_CANCEL_OPTION);
-
             if (value != JOptionPane.YES_OPTION) {
                 System.exit(0);
             }  else {

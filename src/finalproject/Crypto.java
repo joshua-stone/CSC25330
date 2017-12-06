@@ -1,14 +1,20 @@
 /*
     Program: PasswordManagerStartup.java
     Written by: Joshua Stone
-    Description:
-    Challenges:
-    Time Spent:
+    Description: A collection of cryptographic methods for secure file storage
+    Challenges: Finding a way to get data from a file and decrypt and encrypt in a reliable manner
+    Time Spent: 3 hours
 
     Revision History:
     Date:        By:             Action:
     ---------------------------------------------------
     12/02/17     Joshua Stone    Initial commit
+    12/05/17     Joshua Stone    Use AES encryption for storing the dumped password file
+    12/05/17     Joshua Stone    Make sure a salt and initialization vector are used
+    12/05/17     Joshua Stone    Create simple password generator method using letters and numbers
+    12/05/17     Joshua Stone    Implement methods that encrypt a file and can decrypt as well
+    12/05/17     Joshua Stone    Stabilize final file format
+
 */
 package finalproject;
 
@@ -40,15 +46,15 @@ public class Crypto {
         return data;
     }
     public static byte[] fileDecrypt(final byte[] input, final String password) throws IOException {
-            ByteArrayInputStream infile = new ByteArrayInputStream(input);
-            byte[] salt = new byte[saltPad];
-            byte[] iv = new byte[ivPad];
+            final ByteArrayInputStream infile = new ByteArrayInputStream(input);
+            final byte[] salt = new byte[saltPad];
+            final byte[] iv = new byte[ivPad];
 
             infile.read(salt);
             infile.read(iv);
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            SecretKey secret = getSecret(password, salt);
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            final SecretKey secret = getSecret(password, salt);
 
             Cipher cipher = null;
             try {
@@ -58,13 +64,15 @@ public class Crypto {
                 System.out.println("Invalid algorithm available");
                 System.exit(2);
             }
-            byte[] in = new byte[bufferSize];
+            final byte[] in = new byte[bufferSize];
+
             int read;
+
             while ((read = infile.read(in)) != -1) {
                 outputStream.write(cipher.update(in, 0, read));
             }
             try {
-                byte[] output = cipher.doFinal();
+                final byte[] output = cipher.doFinal();
                 outputStream.write(output);
                 outputStream.flush();
             } catch (BadPaddingException | IllegalBlockSizeException e) {
@@ -74,17 +82,17 @@ public class Crypto {
             return outputStream.toByteArray();
     }
     public static void fileEncrypt(final byte[] inputStream, final String outputFile, final String password) throws IOException {
-        try (FileOutputStream outFile = new FileOutputStream(outputFile)) {
+        try (final FileOutputStream outFile = new FileOutputStream(outputFile)) {
 
-            byte[] salt = getSalt();
+            final byte[] salt = getSalt();
 
-            SecretKey secret = getSecret(password, salt);
+            final SecretKey secret = getSecret(password, salt);
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secret);
 
-            byte[] iv = getIV(cipher);
-            byte[] encrypted = new byte[cipher.getOutputSize(inputStream.length)];
+            final byte[] iv = getIV(cipher);
+            final byte[] encrypted = new byte[cipher.getOutputSize(inputStream.length)];
 
             int enc_len = cipher.update(inputStream, 0, inputStream.length, encrypted, 0);
 
@@ -101,10 +109,10 @@ public class Crypto {
     private static SecretKey getSecret(final String password, final byte[] salt) {
         SecretKey secret;
         try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+            final SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
 
-            KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, iterations, keyLength);
-            SecretKey secretKey = factory.generateSecret(keySpec);
+            final KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, iterations, keyLength);
+            final SecretKey secretKey = factory.generateSecret(keySpec);
             secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
         } catch (Exception e) {
             secret = null;
@@ -114,7 +122,7 @@ public class Crypto {
     private static byte[] getSalt() {
         final byte[] salt = new byte[saltPad];
 
-        SecureRandom secureRandom = new SecureRandom();
+        final SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(salt);
 
         return salt;
@@ -122,7 +130,7 @@ public class Crypto {
     private static byte[] getIV(final Cipher cipher) {
         byte[] iv;
         try {
-            AlgorithmParameters params = cipher.getParameters();
+            final AlgorithmParameters params = cipher.getParameters();
 
             iv = params.getParameterSpec(IvParameterSpec.class).getIV();
         } catch (InvalidParameterSpecException e) {
@@ -130,10 +138,10 @@ public class Crypto {
         }
         return iv;
     }
-    public static String randomString(int length) {
+    public static String randomString(final int length) {
         final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-        SecureRandom rng = new SecureRandom();
+        final SecureRandom rng = new SecureRandom();
         char[] text = new char[length];
         for (int i = 0; i < length; i++) {
             text[i] = characters.charAt(rng.nextInt(characters.length()));

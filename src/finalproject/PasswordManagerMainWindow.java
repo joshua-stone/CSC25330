@@ -1,9 +1,9 @@
 /*
     Program: PasswordManagerMainWindow.java
     Written by: Joshua Stone
-    Description:
-    Challenges:
-    Time Spent:
+    Description: The main window of the program after logging in with a master password
+    Challenges: Having UI update correctly when adding and removing passwords
+    Time Spent: 4 hours
 
     Revision History:
     Date:        By:             Action:
@@ -11,7 +11,15 @@
     12/02/17     Joshua Stone    Initial commit
     12/02/17     Joshua Stone    Create constructor for PasswordManagerMainWindow
     12/02/17     Joshua Stone    Use Properties() for parsing file data
-    12/02/17     Joshua Stone
+    12/02/17     Joshua Stone    Have constructor take either a password
+    12/05/17     Joshua Stone    Have a second constructor for previous usages
+    12/05/17     Joshua Stone    Parse property file buy storing values in three array lists
+    12/05/17     Joshua Stone    Present labels as a JList
+    12/05/17     Joshua Stone    Implement updating JList with Add window
+    12/05/17     Joshua Stone    Have a swing worker for adding and removing to JList without multithreading issues
+    12/05/17     Joshua Stone    Have an update() function to save state while typing
+    12/05/17     Joshua Stone    Have save() to save and encrypt session data
+    12/05/17     Joshua Stone    Have fields disabled until an item is selected
 */
 
 package finalproject;
@@ -36,8 +44,6 @@ public class PasswordManagerMainWindow extends JFrame {
     protected JList<String> labels;
     private String masterPassword;
     private JButton deleteButton;
-    private JButton addButton;
-    private Properties passwordStore;
 
     public PasswordManagerMainWindow(final String masterPassword) {
         this(masterPassword, new byte[0]);
@@ -45,12 +51,14 @@ public class PasswordManagerMainWindow extends JFrame {
     public PasswordManagerMainWindow(final String masterPassword, final byte[] decryptedBlob) {
         this.masterPassword = masterPassword;
         InputStream input = new ByteArrayInputStream(decryptedBlob);
-        this.passwordStore = new Properties();
+        Properties passwordStore = new Properties();
 
+        // Attempt to load password store into a property object, or fail and close program prematurely
         try {
-            this.passwordStore.load(input);
+            passwordStore.load(input);
         } catch (IOException e) {
-
+            System.out.println("Failed to load password file.");
+            System.exit(-1);
         }
         this.labelList = new ArrayList<>();
         this.userList = new ArrayList<>();
@@ -58,12 +66,13 @@ public class PasswordManagerMainWindow extends JFrame {
 
         int index = 0;
 
+        // Since the .properties format lacks many features, a flat structure is used with rows of key-value pairs
+        // being enumerated
         while (true) {
             try {
-                //config.getProperty(String.format("%s", index));
-                final String label = this.passwordStore.getProperty(String.format("label_%s", index));
-                final String user = this.passwordStore.getProperty(String.format("user_%s", index));
-                final String pass = this.passwordStore.getProperty(String.format("pass_%s", index));
+                final String label = passwordStore.getProperty(String.format("label_%s", index));
+                final String user = passwordStore.getProperty(String.format("user_%s", index));
+                final String pass = passwordStore.getProperty(String.format("pass_%s", index));
 
                 if (label == null || user == null || pass == null) {
                     break;
@@ -75,12 +84,13 @@ public class PasswordManagerMainWindow extends JFrame {
                 }
 
             } catch (Exception e) {
-
+                System.out.println("Incorrect parsing");
             }
         }
         this.labels = new JList<>(this.labelList.toArray(new String[0]));
         this.labels.addListSelectionListener(event -> this.setCredentials());
         this.usernameField = new JTextField(10);
+        // Detect key presses and update values in input fields as needed
         this.usernameField.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 update();
@@ -88,23 +98,28 @@ public class PasswordManagerMainWindow extends JFrame {
         });
 
         this.passwordField = new JPasswordField(10);
+        // Swing doesn't allow copy and pasting by default, so enable it so passwords can be used elsewhere
         this.passwordField.putClientProperty("JPasswordField.cutCopyAllowed", true);
 
         JPanel buttonRow = new JPanel(new FlowLayout());
 
+        // Delete will remove the currently selected label along with its username and password
         this.deleteButton = new JButton("Delete");
         this.deleteButton.addActionListener(event -> this.delete());
-        this.addButton = new JButton("Add");
-        this.addButton.addActionListener(event -> this.add());
-
+        // Open a window for adding a label, username, and password
+        JButton addButton = new JButton("Add");
+        addButton.addActionListener(event -> this.add());
+        // Upon clicking save, serialize the session data, encrypt, and write to file
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(event -> this.save());
-        buttonRow.add(this.addButton);
+
+        buttonRow.add(addButton);
         buttonRow.add(this.deleteButton);
         buttonRow.add(saveButton);
-
+        // A JList doesn't have a selected item by default, so an exception would be raised if anything was entered in
+        // an input field
         this.setEnabledFields(false);
-
+        // Scrollpane makes cycling through passwords easier
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setSize(220, 20);
         scrollPane.setViewportView(this.labels);
@@ -121,18 +136,16 @@ public class PasswordManagerMainWindow extends JFrame {
         root.add(buttonRow, BorderLayout.SOUTH);
         root.setBorder(new EmptyBorder(10, 10, 10, 10));
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        //this.setCredentials();
         this.add(root);
         this.setSize(500, 150);
-        //this.pack();
+        this.setTitle("PasswordManager");
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
     int getIndex() {
         return this.labels.getSelectedIndex();
     }
-    void setCredentials() {
+    private void setCredentials() {
         this.setEnabledFields(true);
         String userText = this.userList.get(this.getIndex());
         this.usernameField.setText(userText);
@@ -178,7 +191,7 @@ public class PasswordManagerMainWindow extends JFrame {
         }
         try {
             byte[] converted = Serialize.convertProperties(properties);
-            Crypto.fileEncrypt(converted, "test_file", this.masterPassword);
+            Crypto.fileEncrypt(converted, "passwordmanager.properties", this.masterPassword);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error: Couldn't save file");
         }
@@ -192,12 +205,13 @@ class RemovePassword extends SwingWorker<Integer, Integer>  {
         this.index = this.passwordManagerMainWindow.getIndex();
     }
     public Integer doInBackground() {
+        // JLists aren't thread-safe, so use a worker thread to update safely
         this.passwordManagerMainWindow.labelList.remove(this.index);
         this.passwordManagerMainWindow.userList.remove(this.index);
         this.passwordManagerMainWindow.passList.remove(this.index);
         this.passwordManagerMainWindow.labels.setListData(this.passwordManagerMainWindow.labelList.toArray(new String[0]));
 
-        return 1;
+        return 0;
     }
     public void done() {
         this.passwordManagerMainWindow.setEnabled(true);
