@@ -13,11 +13,13 @@
     12/06/17     Joshua Stone    Make constructor call superclass along with disabling parent window
     12/06/17     Joshua Stone    Override initMainWindow()
     12/06/17     Joshua Stone    Override cancel()
+    12/06/17     Joshua Stone    Add serialVersionUID to pass linting
 */
 
 package finalproject;
 
 public class ResetMasterPassword extends CreateNewMasterPassword {
+    private static final long serialVersionUID = 1L;
     final PasswordManagerMainWindow passwordManagerMainWindow;
 
     public ResetMasterPassword(final PasswordManagerMainWindow passwordManagerMainWindow) {
