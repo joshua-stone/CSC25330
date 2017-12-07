@@ -72,7 +72,7 @@ public class CreateNewMasterPassword extends JFrame {
         masterPasswordPanel.add(inputPanel, BorderLayout.CENTER);
         masterPasswordPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        this.setTitle("PasswordManager");
+        this.setTitle("Set Master Password");
         this.add(masterPasswordPanel);
         this.pack();
         this.setResizable(false);
