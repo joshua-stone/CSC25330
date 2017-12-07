@@ -84,13 +84,13 @@ public class AddPassword extends JFrame {
     private void generatePassword() {
         this.passField.setText(Crypto.randomString(16));
     }
-    String getLabel() {
+    private String getLabel() {
         return this.labelField.getText();
     }
-    String getUsername() {
+    private String getUsername() {
         return this.userField.getText();
     }
-    String getPassword() {
+    private String getPassword() {
         return String.valueOf(this.passField.getPassword());
     }
     private void checkCredentials() {
