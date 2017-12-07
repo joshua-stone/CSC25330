@@ -58,14 +58,11 @@ public class CreateNewMasterPassword extends JFrame {
 
         // Start a new session with master password
         this.okButton = new JButton("Enter");
-        this.okButton.addActionListener(event -> {
-            this.dispose();
-            new PasswordManagerMainWindow(this.getPassword());
-        });
+        this.okButton.addActionListener(event -> this.initMainWindow());
         this.okButton.setEnabled(false);
 
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(event -> this.dispose());
+        cancelButton.addActionListener(event -> this.cancel());
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.add(this.okButton);
@@ -83,7 +80,7 @@ public class CreateNewMasterPassword extends JFrame {
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
-    private String getPassword() {
+    protected String getPassword() {
         return String.valueOf(this.passwordField.getPassword());
     }
     // Simple password check for both input fields
@@ -95,5 +92,12 @@ public class CreateNewMasterPassword extends JFrame {
         } else {
             this.okButton.setEnabled(false);
         }
+    }
+    protected void cancel() {
+        this.dispose();
+    }
+    protected void initMainWindow() {
+        this.dispose();
+        new PasswordManagerMainWindow(this.getPassword());
     }
 }
