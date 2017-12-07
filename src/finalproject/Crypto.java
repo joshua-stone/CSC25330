@@ -55,14 +55,14 @@ public class Crypto {
     }
     public static byte[] fileDecrypt(final byte[] input, final String password) throws BadPaddingException, IOException {
             final ByteArrayInputStream infile = new ByteArrayInputStream(input);
-            final byte[] salt = new byte[saltPad];
-            final byte[] iv = new byte[ivPad];
+            final byte[] salt = new byte[Crypto.saltPad];
+            final byte[] iv = new byte[Crypto.ivPad];
 
             // Read the first bytes of the byte array based on the size of the salt pad and iv pad
             final int saltSize = infile.read(salt);
             final int ivSize = infile.read(iv);
 
-            if (saltSize + ivSize < saltSize + ivPad) {
+            if (saltSize + ivSize < saltSize + Crypto.ivPad) {
                 System.out.println("Salt and iv pads are too small");
                 System.exit(-1);
             }
@@ -72,7 +72,7 @@ public class Crypto {
             Cipher cipher = null;
             try {
                 // https://docs.oracle.com/javase/9/docs/api/javax/crypto/Cipher.html
-                cipher = Cipher.getInstance(algorithm);
+                cipher = Cipher.getInstance(Crypto.algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
             } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException e) {
                 // Many different exceptions can be caused from attempt to decrypt, so just fail if any occur
@@ -80,7 +80,7 @@ public class Crypto {
                 System.exit(2);
             }
             // File should be read in chunks
-            final byte[] chunk = new byte[bufferSize];
+            final byte[] chunk = new byte[Crypto.bufferSize];
 
             int read;
             // Returns the number of bytes read into chunks
@@ -107,7 +107,7 @@ public class Crypto {
 
             final SecretKey secret = getSecret(password, salt);
             // Use the same cipher for encryption and decryption
-            final Cipher cipher = Cipher.getInstance(algorithm);
+            final Cipher cipher = Cipher.getInstance(Crypto.algorithm);
             cipher.init(Cipher.ENCRYPT_MODE, secret);
 
             final byte[] iv = getIV(cipher);
@@ -132,7 +132,7 @@ public class Crypto {
         try {
             final SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
             // Use the password and random salt with key size and number of iterations to generate a secret
-            final KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, iterations, keyLength);
+            final KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, Crypto.iterations, Crypto.keyLength);
             final SecretKey secretKey = factory.generateSecret(keySpec);
             secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {

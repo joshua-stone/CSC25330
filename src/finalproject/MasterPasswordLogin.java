@@ -111,28 +111,16 @@ class ButtonEvent extends SwingWorker<Integer, Integer>  {
         try {
             this.decryptedBlob = Crypto.fileDecrypt(this.encryptedBlob, this.password);
             this.isCorrect = true;
-        } catch (IOException e1) {
+        } catch (IOException | BadPaddingException e1) {
             try {
                 // If unlocking failed, pause for a moment to slow down attempts at brute forcing
                 Thread.sleep(ButtonEvent.timeout);
             } catch(InterruptedException interrupted) {
                 System.out.println("Thread terminated prematurely");
             }
-
             this.isCorrect = false;
-        // If an obvious file error comes up that doesn't seem recoverable, then ask to make a new password store
-        } catch (BadPaddingException e2) {
-            final int value = JOptionPane.showConfirmDialog(null,
-                    "File corrupt. Create a master password?",
-                    "Corrupt new file",
-                    JOptionPane.OK_CANCEL_OPTION);
-            if (value != JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }  else {
-                this.masterPasswordLogin.dispose();
-                new CreateNewMasterPassword();
-            }
         }
+
         return 0;
     }
     protected void done() {

@@ -20,6 +20,7 @@
 package finalproject;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class AddPassword extends JFrame {
@@ -71,6 +72,7 @@ public class AddPassword extends JFrame {
         final JPanel root = new JPanel(new BorderLayout());
         root.add(inputPanel, BorderLayout.CENTER);
         root.add(buttonRow, BorderLayout.SOUTH);
+        root.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         this.setTitle("New");
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

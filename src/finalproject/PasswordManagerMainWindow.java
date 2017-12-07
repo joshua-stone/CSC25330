@@ -21,6 +21,7 @@
     12/05/17     Joshua Stone    Have save() to save and encrypt session data
     12/05/17     Joshua Stone    Have fields disabled until an item is selected
     12/05/17     Joshua Stone    Add serialVersionUID for linting
+    12/06/17     Joshua Stone    Refactor constructor to take different arguments
 */
 
 package finalproject;
@@ -51,10 +52,8 @@ public class PasswordManagerMainWindow extends JFrame {
         this(masterPassword, new byte[0]);
     }
     public PasswordManagerMainWindow(final String masterPassword, final byte[] decryptedBlob) {
-        this.masterPassword = masterPassword;
         InputStream input = new ByteArrayInputStream(decryptedBlob);
         Properties passwordStore = new Properties();
-
         // Attempt to load password store into a property object, or fail and close program prematurely
         try {
             passwordStore.load(input);
@@ -62,14 +61,11 @@ public class PasswordManagerMainWindow extends JFrame {
             System.out.println("Failed to load password file.");
             System.exit(-1);
         }
-        this.labelList = new ArrayList<>();
-        this.userList = new ArrayList<>();
-        this.passList = new ArrayList<>();
+        ArrayList<String> labelList = new ArrayList<>();
+        ArrayList<String> userList = new ArrayList<>();
+        ArrayList<String> passList = new ArrayList<>();
 
         int index = 0;
-
-        // Since the .properties format lacks many features, a flat structure is used with rows of key-value pairs
-        // being enumerated
         while (true) {
             try {
                 final String label = passwordStore.getProperty(String.format("label_%s", index));
@@ -79,9 +75,9 @@ public class PasswordManagerMainWindow extends JFrame {
                 if (label == null || user == null || pass == null) {
                     break;
                 } else {
-                    this.labelList.add(label);
-                    this.userList.add(user);
-                    this.passList.add(pass);
+                    labelList.add(label);
+                    userList.add(user);
+                    passList.add(pass);
                     index++;
                 }
 
@@ -89,6 +85,14 @@ public class PasswordManagerMainWindow extends JFrame {
                 System.out.println("Incorrect parsing");
             }
         }
+        new PasswordManagerMainWindow(masterPassword, labelList, userList, passList);
+    }
+    public PasswordManagerMainWindow(final String masterPassword, final ArrayList<String> labelList, final ArrayList<String> userList, final ArrayList<String> passList) {
+        this.masterPassword = masterPassword;
+        this.labelList = labelList;
+        this.userList = userList;
+        this.passList = passList;
+
         this.labels = new JList<>(this.labelList.toArray(new String[0]));
         this.labels.addListSelectionListener(event -> this.setCredentials());
         this.usernameField = new JTextField(10);
@@ -133,10 +137,20 @@ public class PasswordManagerMainWindow extends JFrame {
         topPanel.add(scrollPane);
         topPanel.add(this.usernameField);
         topPanel.add(this.passwordField);
+
         JPanel root = new JPanel(new BorderLayout());
         root.add(topPanel, BorderLayout.CENTER);
         root.add(buttonRow, BorderLayout.SOUTH);
         root.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu optionMenu = new JMenu("Options");
+        JMenuItem resetMasterPassword = new JMenuItem("Reset master password");
+        resetMasterPassword.addActionListener( event ->this.resetMasterPassword());
+        optionMenu.add(resetMasterPassword);
+        menuBar.add(optionMenu);
+
+        this.setJMenuBar(menuBar);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.add(root);
         this.setSize(500, 150);
@@ -197,6 +211,12 @@ public class PasswordManagerMainWindow extends JFrame {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error: Couldn't save file");
         }
+    }
+    protected void setMasterPassword(final String masterPassword) {
+        this.masterPassword = masterPassword;
+    }
+    protected void resetMasterPassword() {
+        new ResetMasterPassword(this);
     }
 }
 class RemovePassword extends SwingWorker<Integer, Integer>  {
