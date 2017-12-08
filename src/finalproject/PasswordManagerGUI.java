@@ -24,15 +24,16 @@ package finalproject;
 import javax.swing.*;
 import java.io.File;
 
+// PasswordManagerGUI bootstraps the rest of the program depending on the presence of a passwordmanager.properties file
 public class PasswordManagerGUI {
     private String passwordFileName = "passwordmanager.properties";
-    private final File passwordFile;
+
     public PasswordManagerGUI() {
         // Get a reference to a password file
-        this.passwordFile = new File(this.passwordFileName);
-
-        if (this.passwordFile.exists()) {
-            // Attempt to restore a previous session
+        final File passwordFile = new File(this.passwordFileName);
+        // Check if the password file exists
+        if (passwordFile.exists()) {
+            // Attempt to restore a previous session if a password file is detected
             new MasterPasswordLogin(this.passwordFileName);
         } else {
             // Else, prompt to make a new password
@@ -40,13 +41,16 @@ public class PasswordManagerGUI {
                     "Create a master password?",
                     "Password file not found",
                     JOptionPane.OK_CANCEL_OPTION);
+            // If Close or Cancel are pressed, close the program
             if (value != JOptionPane.YES_OPTION) {
                 System.exit(0);
+                // Else, start next part of the program
             }  else {
                 new CreateNewMasterPassword();
             }
         }
     }
+    // Start the program
     public static void main(final String[] args) {
         new PasswordManagerGUI();
     }

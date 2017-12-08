@@ -22,20 +22,21 @@ package finalproject;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-
+// Creates a dialog for adding a label, username, and password
 public class AddPassword extends JFrame {
+    // Serial version ID for linting
     private static final long serialVersionUID = 1L;
     private final PasswordManagerMainWindow passwordManagerMainWindow;
     private final JTextField labelField;
     private final JTextField userField;
     private final JPasswordField passField;
-
+    // Simply takes a reference to a main window so it can add a label, username, and password
     public AddPassword(final PasswordManagerMainWindow passwordManagerMainWindow) {
         // Taking a reference to a parent window means more control over widgets
         this.passwordManagerMainWindow = passwordManagerMainWindow;
         this.passwordManagerMainWindow.setEnabled(false);
         final JPanel inputPanel = new JPanel(new GridLayout(6,1));
-
+        // Create the label, username, and password fields.
         final JLabel labelText = new JLabel("Label:");
         this.labelField = new JTextField(20);
         final JLabel userText = new JLabel("Username:");
@@ -58,7 +59,7 @@ public class AddPassword extends JFrame {
         // Fill the password field with a randomly generated string
         generatePasswordButton.addActionListener(event -> this.generatePassword());
         final JPanel buttonRow = new JPanel();
-
+        // Add the widgets to panels
         buttonRow.add(saveButton);
         buttonRow.add(cancelButton);
         buttonRow.add(generatePasswordButton);
@@ -68,12 +69,12 @@ public class AddPassword extends JFrame {
         inputPanel.add(userField);
         inputPanel.add(passText);
         inputPanel.add(passField);
-
+        // Place widgets in a root pane
         final JPanel root = new JPanel(new BorderLayout());
         root.add(inputPanel, BorderLayout.CENTER);
         root.add(buttonRow, BorderLayout.SOUTH);
         root.setBorder(new EmptyBorder(10, 10, 10, 10));
-
+        // Put together the rest of the window
         this.setTitle("New");
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.setLocationRelativeTo(this.passwordManagerMainWindow);
@@ -81,18 +82,23 @@ public class AddPassword extends JFrame {
         this.pack();
         this.setVisible(true);
     }
+    // Calls a password generator which puts its result in the password field
     private void generatePassword() {
         this.passField.setText(Crypto.randomString(16));
     }
+    // Returns the value in the label field
     private String getLabel() {
         return this.labelField.getText();
     }
+    // Returns the value in the username field
     private String getUsername() {
         return this.userField.getText();
     }
+    // Returns the value in the password field
     private String getPassword() {
         return String.valueOf(this.passField.getPassword());
     }
+    // Simple check to make sure none of the input fields are empty so data storage doesn't break
     private void checkCredentials() {
         if (this.getLabel().length() == 0 || this.getUsername().length() == 0 || this.getPassword().length() == 0) {
             JOptionPane.showMessageDialog(this, "Error: One or more fields are empty");
@@ -103,29 +109,33 @@ public class AddPassword extends JFrame {
         }
     }
 }
+//  Swing worker for updating labelPicker
 class UpdatePassword extends SwingWorker<Integer, Integer> {
     private final PasswordManagerMainWindow passwordManagerMainWindow;
     private final String label;
     private final String username;
     private final String password;
 
+    // Have the swing worker take a reference to the main window, and give it a label, username, and password so it can update
     public UpdatePassword(final PasswordManagerMainWindow passwordManagerMainWindow, final String label, final String username, final String password) {
         this.passwordManagerMainWindow = passwordManagerMainWindow;
         this.label = label;
         this.username = username;
         this.password = password;
     }
+    // Runs an update on labelPicker in the background
     public Integer doInBackground() {
-        // JLists need to be updated in a worker thread to prevent exceptions
+        // labelPicker need to be updated in a worker thread to prevent exceptions
         this.passwordManagerMainWindow.labelList.add(this.label);
         this.passwordManagerMainWindow.userList.add(this.username);
         this.passwordManagerMainWindow.passList.add(this.password);
-        this.passwordManagerMainWindow.labels.setListData(this.passwordManagerMainWindow.labelList.toArray(new String[0]));
+        this.passwordManagerMainWindow.labelPicker.setListData(this.passwordManagerMainWindow.labelList.toArray(new String[0]));
 
         return 0;
     }
+    // Frees up the main window once it's safe to use the UI again
     public void done() {
-        // With JList updated, re-enable parent window and clear inputs
+        // With labelPicker updated, clear input fields to create a neutral state and re-enable the main window
         this.passwordManagerMainWindow.setEnabled(true);
         this.passwordManagerMainWindow.setEnabledFields(false);
         this.passwordManagerMainWindow.clearFields();
