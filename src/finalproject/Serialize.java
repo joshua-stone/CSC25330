@@ -16,10 +16,11 @@ package finalproject;
 import java.io.*;
 import java.util.Properties;
 
+
 public class Serialize {
+    // Just converts a Properties object to a byte array so it can be encrypted
     public static byte[] convertProperties(final Properties properties) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
         // Use built-in store() to dump to a stream
         properties.store(outputStream, null);
         // Now put stream into a byte array

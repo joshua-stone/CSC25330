@@ -31,7 +31,7 @@ public class CreateNewMasterPassword extends JFrame {
     private JButton okButton;
     private JPasswordField passwordField;
     private JPasswordField passwordConfirmField;
-
+    // Called after user agrees to make a new session, as they'll need a password for protecting data
     public CreateNewMasterPassword() {
         JPanel inputPanel = new JPanel(new GridLayout(2,2));
         this.passwordField = new JPasswordField(10);
@@ -50,7 +50,7 @@ public class CreateNewMasterPassword extends JFrame {
         });
         JLabel label1 = new JLabel("Enter master password:");
         JLabel label2 = new JLabel("Confirm master password:");
-
+        // Put widgets into their own panel
         inputPanel.add(label1);
         inputPanel.add(passwordField);
         inputPanel.add(label2);
@@ -60,7 +60,7 @@ public class CreateNewMasterPassword extends JFrame {
         this.okButton = new JButton("Enter");
         this.okButton.addActionListener(event -> this.initMainWindow());
         this.okButton.setEnabled(false);
-
+        // Make an Ok and Cancel button
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(event -> this.cancel());
 
@@ -68,10 +68,11 @@ public class CreateNewMasterPassword extends JFrame {
         buttonPanel.add(this.okButton);
         buttonPanel.add(cancelButton);
         JPanel masterPasswordPanel = new JPanel(new BorderLayout());
+        // Borders help improve the appearance of the window
         masterPasswordPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         masterPasswordPanel.add(inputPanel, BorderLayout.CENTER);
         masterPasswordPanel.add(buttonPanel, BorderLayout.SOUTH);
-
+        // Set up the rest of the main window
         this.setTitle("Set Master Password");
         this.add(masterPasswordPanel);
         this.pack();
@@ -80,10 +81,11 @@ public class CreateNewMasterPassword extends JFrame {
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
-    protected String getPassword() {
+    // Retrieves the current value of the password field
+    String getPassword() {
         return String.valueOf(this.passwordField.getPassword());
     }
-    // Simple password check for both input fields
+    // Simple check for both password input fields to make sure they aren't empty and match
     private void checkPassword() {
         char[] pass1 = this.passwordField.getPassword();
         char[] pass2 = this.passwordConfirmField.getPassword();
@@ -93,9 +95,11 @@ public class CreateNewMasterPassword extends JFrame {
             this.okButton.setEnabled(false);
         }
     }
+    // Closes the program if selected
     protected void cancel() {
         this.dispose();
     }
+    // Once a password has been made, close this window and start the main session window
     protected void initMainWindow() {
         this.dispose();
         new PasswordManagerMainWindow(this.getPassword());

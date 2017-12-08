@@ -13,6 +13,7 @@
     12/05/17     Joshua Stone    Add password input field
     12/05/17     Joshua Stone    Add buttons for password, cancel, and save
     12/05/17     Joshua Stone    Implement a swing worker for checking password
+    12/05/17     Joshua Stone    Have a timeout if a password attempt fails
     12/05/17     Joshua Stone    Disable GUI while checking password
     12/05/17     Joshua Stone    Clear password if login attempt fails
     12/05/17     Joshua Stone    Add serialVersionUID for linting
@@ -27,13 +28,14 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
+// This class should be started if a password file is detected
 public class MasterPasswordLogin extends JFrame {
     private static final long serialVersionUID = 1L;
-    final byte[] infile;
     final JPasswordField passwordField;
     final JButton passwordButton;
+    // Creates a new window with a password input field for attempting to decrypt a password file
     MasterPasswordLogin(final String passwordFileName) {
-        this.infile = Crypto.readFile(passwordFileName);
+        final byte[] infile = Crypto.readFile(passwordFileName);
         JPanel inputPanel = new JPanel(new GridLayout(1,2));
         this.passwordField = new JPasswordField(10);
         JLabel label1 = new JLabel("Enter password: ");
@@ -46,9 +48,9 @@ public class MasterPasswordLogin extends JFrame {
         passwordButton.addActionListener(event -> {
             new ButtonEvent(this, infile, getPassword()).execute();
         });
-
+        // Disable password button by default so user can't use a empty password
         this.passwordButton.setEnabled(false);
-
+        // Pressing Cancel closes the program
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(event -> this.dispose());
 
@@ -58,7 +60,7 @@ public class MasterPasswordLogin extends JFrame {
             this.dispose();
             new CreateNewMasterPassword();
         });
-        // Make sure empty passwords can't be entered
+        // Check input as password is being entered, and allow user to press Ok if it's not empty
         this.passwordField.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 char[] pass1 = passwordField.getPassword();
@@ -69,16 +71,17 @@ public class MasterPasswordLogin extends JFrame {
                 }
             }
         });
+        // Make a row of buttons
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.add(this.passwordButton);
         buttonPanel.add(cancelButton);
         buttonPanel.add(newButton);
-
+        // Put widgets into a root panel
         JPanel root = new JPanel(new BorderLayout());
-
         root.add(inputPanel, BorderLayout.CENTER);
         root.add(buttonPanel, BorderLayout.SOUTH);
         root.setBorder(new EmptyBorder(10, 10, 10, 10));
+        // Set up the rest of the window
         this.setTitle("PasswordManager");
         this.add(root);
         this.pack();
@@ -86,6 +89,7 @@ public class MasterPasswordLogin extends JFrame {
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
+    // Gets the value in the password field
     private String getPassword() {
         return String.valueOf(this.passwordField.getPassword());
     }

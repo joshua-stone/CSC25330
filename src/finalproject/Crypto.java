@@ -48,24 +48,26 @@ public class Crypto {
             System.out.println("File not found");
             System.exit(-1);
         } catch (IOException e) {
+            // Failure to read could be caused by incorrect file permissions
             System.out.println("Failed to read file");
             System.exit(-1);
         }
         return data;
     }
+    // Method for decrypting file in memory a password
     public static byte[] fileDecrypt(final byte[] input, final String password) throws BadPaddingException, IOException {
             final ByteArrayInputStream infile = new ByteArrayInputStream(input);
             final byte[] salt = new byte[Crypto.saltPad];
             final byte[] iv = new byte[Crypto.ivPad];
-
-            // Read the first bytes of the byte array based on the size of the salt pad and iv pad
+            // Read the first bytes of the byte array based on the known size of the salt pad and iv pad
             final int saltSize = infile.read(salt);
             final int ivSize = infile.read(iv);
-
-            if (saltSize + ivSize < saltSize + Crypto.ivPad) {
-                System.out.println("Salt and iv pads are too small");
+            // Finding that the salt and iv pads are too small means the file doesn't contain valid data
+            if (saltSize + ivSize < Crypto.saltPad + Crypto.ivPad) {
+                System.out.println("File is too small");
                 System.exit(-1);
             }
+            // Get ready to decrypt the file with a secret key and read it into memory
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             final SecretKey secret = getSecret(password, salt);
 
@@ -100,6 +102,7 @@ public class Crypto {
             }
             return outputStream.toByteArray();
     }
+    // Takes a byte array representing use data, and encrypts it using a password and stores it to the disk
     public static void fileEncrypt(final byte[] inputStream, final String outputFile, final String password) throws IOException {
         try (final FileOutputStream outFile = new FileOutputStream(outputFile)) {
 
@@ -116,26 +119,29 @@ public class Crypto {
             int enc_len = cipher.update(inputStream, 0, inputStream.length, encrypted, 0);
             // Finalize encryption
             cipher.doFinal(encrypted, enc_len);
-            // Write salt, iv, and encrypted stream to file
+            // Write salt, iv, and encrypted stream to file, in that order
             outFile.write(salt);
             outFile.write(iv);
             outFile.write(encrypted);
 
         } catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | ShortBufferException e) {
+            // There are many ways for an exception to be caused, but not making the program quit could help the user fix the problem
+            // before attempting to save again
             System.out.println("Error in encrypting.");
         }
     }
-    // Generates a secret key
+    // Generates a key for decrypting a file
     private static SecretKey getSecret(final String password, final byte[] salt) {
         SecretKey secret = null;
 
         try {
             final SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-            // Use the password and random salt with key size and number of iterations to generate a secret
+            // Use the password and random salt with key size and number of iterations to create a secret key
             final KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, Crypto.iterations, Crypto.keyLength);
             final SecretKey secretKey = factory.generateSecret(keySpec);
             secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            // Close the program if there's a failure, as the program absolutely needs a key to decrypt data
             System.out.println("Couldn't generate secret key");
             System.exit(-1);
         }
@@ -144,20 +150,24 @@ public class Crypto {
     // Generates a random salt as a source of uniqueness
     private static byte[] getSalt() {
         final byte[] salt = new byte[saltPad];
-
+        // Read secureRandom into salt until reaches the capacity set by saltPad
         final SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(salt);
 
         return salt;
     }
     // Generate an initialization vector for increased uniqueness
+    // https://crypto.stackexchange.com/questions/732/why-use-an-initialization-vector-iv
     private static byte[] getIV(final Cipher cipher) {
-        byte[] iv = null;
+        byte[] iv = new byte[ivPad];
+
         try {
             final AlgorithmParameters params = cipher.getParameters();
-
+            // IVs are essentially the starting values for an input to a cryptographic cipher, therefore random values
+            // make guessing more difficult
             iv = params.getParameterSpec(IvParameterSpec.class).getIV();
         } catch (InvalidParameterSpecException e) {
+            // Close if IV can't  be generated as it's required for strong encryption
             System.out.println("Couldn't generate IV");
             System.exit(-1);
         }
@@ -166,9 +176,10 @@ public class Crypto {
     // A simple password generator that produces a string of random numbers and letters of a specified length
     public static String randomString(final int length) {
         final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
+        // Strong passwords require a good source of entropy to make cracking difficult
         final SecureRandom rng = new SecureRandom();
         char[] text = new char[length];
+        // Essentially picks a random letter from characters and adds it to text until it's full
         for (int i = 0; i < length; i++) {
             text[i] = characters.charAt(rng.nextInt(characters.length()));
         }
